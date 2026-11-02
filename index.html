@@ -85,7 +85,7 @@ const Q=[{t:'Harvest 10 crops',k:'harv',g:10,c:50,m:1},{t:'Plant 15 seeds',k:'pl
 {t:'Retweet the pinned post on X',k:'soc',id:'rt',url:'https://x.com/suprabird_/status/2116444049288614143',g:1,c:100,m:2},
 {t:'Join the Telegram group',k:'soc',id:'tg',url:'https://t.me/supra_bird',g:1,c:100,m:2},
 {t:'Connect your Supra wallet',k:'wallet',g:1,c:200,m:3}];
-const WAIT=8000;
+const WAIT=8000,TRADE_URL='https://floor.supwars.fun/t/0x38eb2b5380cfa493031ed527077598e3024465bd27f09dd0dd86ddcab34f5e81';
 const KEY='birdfarm3';
 const fresh=()=>({coins:30,gems:2,xp:0,sel:0,plots:Array(16).fill(null),open:6,crops:[0,0,0,0,0],stats:{harv:0,plant:0,earn:0},claimed:{},soc:{},wallet:'',soil:0,helpers:0,seen:0});
 let st=fresh(),cur='farm';
@@ -132,7 +132,7 @@ else{const left=Math.ceil((dur(SEEDS[p.s])-(Date.now()-p.at))/1000);panel('msg',
 save();head();paint()}
 const row=(ic,t,sub,btn)=>'<div class="row"><div class="ic">'+ic+'</div><div class="tx"><b>'+t+'</b><small>'+sub+'</small></div>'+btn+'</div>';
 function panel(n,title,html){cur=n;let h=html||'',T=title||'';
-if(n==='shop'){T='🛒 Shop';h=row('🟫','New Plot','Plots open: '+st.open+'/16',st.open>=16?'<b>MAX</b>':'<button class="btn" data-a="buyplot"'+(st.coins<plotCost()?' disabled':'')+'>🪙 '+plotCost()+'</button>')+row('✨','Super Soil','Level '+st.soil+'/5 · crops grow 10% faster per level',st.soil>=5?'<b>MAX</b>':'<button class="btn" data-a="buysoil"'+(st.coins<soilCost()?' disabled':'')+'>🪙 '+soilCost()+'</button>')+row('🐦','Helper Bird','Owned '+st.helpers+'/3 · auto-harvests ready crops',st.helpers>=3?'<b>MAX</b>':'<button class="btn" data-a="buyhelp"'+(st.coins<helpCost()?' disabled':'')+'>🪙 '+helpCost()+'</button>')}
+if(n==='shop'){T='🛒 Shop';h=row('💱','Trade Token','Buy or sell the token on floor.supwars.fun. Trading involves risk.','<button class="btn" data-a="trade">Open</button>')+row('🟫','New Plot','Plots open: '+st.open+'/16',st.open>=16?'<b>MAX</b>':'<button class="btn" data-a="buyplot"'+(st.coins<plotCost()?' disabled':'')+'>🪙 '+plotCost()+'</button>')+row('✨','Super Soil','Level '+st.soil+'/5 · crops grow 10% faster per level',st.soil>=5?'<b>MAX</b>':'<button class="btn" data-a="buysoil"'+(st.coins<soilCost()?' disabled':'')+'>🪙 '+soilCost()+'</button>')+row('🐦','Helper Bird','Owned '+st.helpers+'/3 · auto-harvests ready crops',st.helpers>=3?'<b>MAX</b>':'<button class="btn" data-a="buyhelp"'+(st.coins<helpCost()?' disabled':'')+'>🪙 '+helpCost()+'</button>')}
 if(n==='barn'){T='🏚️ Barn';const tot=st.crops.reduce((a,c,i)=>a+c*SEEDS[i].s,0);h='<button class="btn" data-a="sellall"'+(tot?'':' disabled')+'>Sell everything · 🪙 '+tot+'</button>';SEEDS.forEach((s,i)=>{h+=row(s.e,s.n+' × '+st.crops[i],'Sells for 🪙 '+s.s+' each','<button class="btn" data-a="sell" data-i="'+i+'"'+(st.crops[i]?'':' disabled')+'>Sell</button>')})}
 if(n==='quests'){T='📜 Quests';h='';Q.forEach((q,i)=>{const so=q.k==='soc'?st.soc[q.id]:0,pr=q.k==='lvl'?lvl():q.k==='soc'?(so&&Date.now()-so>=WAIT?1:0):q.k==='wallet'?(st.wallet?1:0):st.stats[q.k],ok=pr>=q.g,cl=st.claimed[i],go=q.k==='soc'&&!so?'<button class="btn" data-a="qgo" data-i="'+i+'">Go</button>':q.k==='wallet'&&!st.wallet?'<button class="btn" data-a="wallet">Connect</button>':null;h+='<div class="row"><div class="ic">📌</div><div class="tx"><b>'+q.t+'</b><small>'+Math.min(pr,q.g)+' / '+q.g+' · Reward 🪙 '+q.c+' 💎 '+q.m+'</small><div class="pb"><i style="width:'+Math.min(100,pr/q.g*100)+'%"></i></div></div>'+(cl?'<b>✓</b>':go?go:'<button class="btn" data-a="claim" data-i="'+i+'"'+(ok?'':' disabled')+'>Claim</button>')+'</div>'})}
 if(n==='lb'){T='🏆 Leaderboard';h='<p>Ranked by total XP.</p><div id="sbb"></div>'}
@@ -153,6 +153,7 @@ else if(a==='claim'&&!st.claimed[i]){st.claimed[i]=1;st.coins+=Q[i].c;st.gems+=Q
 else if(a==='speed'&&st.gems>0&&st.plots[i]){st.gems--;st.plots[i].at=0;$('sheet').hidden=true}
 else if(a==='qgo'&&Q[i]&&Q[i].url){window.open(Q[i].url,'_blank','noopener');st.soc[Q[i].id]=Date.now();setTimeout(()=>{if(cur==='quests'&&!$('sheet').hidden)panel('quests')},WAIT+200)}
 else if(a==='wallet'){connectWallet();return}
+else if(a==='trade'){window.open(TRADE_URL,'_blank','noopener');return}
 else if(a==='setname'){const v=($('nm').value||'').trim().slice(0,16);if(v){pname=v;ls('bf_name',v);lastXp=-1;sync(true)}panel('lb');return}
 else if(a==='reset'){st=fresh();lastXp=-1;seeds();$('sheet').hidden=true}
 save();head();paint();if(!$('sheet').hidden&&['shop','barn','quests'].includes(cur))panel(cur)}
