@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bird Farm | Supra Chain Farming Game</title>
+<meta name="description" content="Bird Farm is a cozy farming game on the Supra chain. Plant crops, harvest and sell them, level up, complete quests, connect your Supra wallet and climb the leaderboard.">
+<style>
+:root{--bg:#5fae2e;--wood:#c98b4a;--wood2:#8a5a33;--cream:#fff6dc;--ink:#4a321a;--bar:#ffb400;--acc:#e5322d;--ok:#4caf30;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#2c5a18;--cream:#f3e6c0}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,sans-serif;display:flex;justify-content:center}
+.app{width:100%;max-width:480px;padding:8px}
+.top{display:flex;gap:6px;align-items:center;margin-bottom:8px}
+.av{width:42px;height:42px;border-radius:50%;background:var(--cream);border:3px solid var(--wood2);flex:none}
+.chip{background:var(--cream);border:3px solid var(--wood2);border-radius:18px;padding:3px 9px;font-weight:800;font-size:14px;box-shadow:0 3px 0 var(--wood2);white-space:nowrap}
+.lv{flex:1;min-width:0}
+.lv b{font-size:12px;color:var(--cream);display:block}
+.xp{height:14px;background:var(--cream);border:3px solid var(--wood2);border-radius:10px;overflow:hidden}
+.xp i{display:block;height:100%;background:var(--bar);width:0}
+.scene{position:relative;width:100%;aspect-ratio:100/118;border-radius:18px;overflow:hidden;border:4px solid var(--wood2);box-shadow:0 4px 0 var(--wood2)}
+.scene>svg{position:absolute;inset:0;width:100%;height:100%}
+.plot{position:absolute;width:15%;height:8.9%;border:0;border-radius:8px;background:#9c6234;box-shadow:inset 0 -4px 0 #7b4a26,0 2px 0 #5a3719;font-size:min(7.5vw,34px);cursor:pointer;padding:0;color:#fff}
+.plot.lock{background:#6c6c5c;box-shadow:inset 0 -4px 0 #4e4e42,0 2px 0 #333;font-size:min(5vw,20px)}
+.plot.rdy{animation:pop .8s infinite;outline:3px solid var(--bar)}
+@keyframes pop{50%{transform:scale(1.1)}}
+.plot small{position:absolute;left:12%;right:12%;bottom:6%;height:5px;background:rgba(0,0,0,.4);border-radius:3px;overflow:hidden}
+.plot small i{display:block;height:100%;background:#8cf04a}
+.toast{position:absolute;left:8px;right:8px;top:8px;background:var(--cream);border:3px solid var(--wood2);border-radius:14px;padding:6px 10px;font-size:13px;font-weight:700;text-align:center;opacity:0;transition:opacity .25s;pointer-events:none}
+.toast.on{opacity:1}
+.sail{transform-box:fill-box;transform-origin:center;animation:spin 8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.w1{animation:walk 14s ease-in-out infinite alternate}
+.w2{animation:walk 19s ease-in-out infinite alternate-reverse}
+@keyframes walk{to{transform:translateX(60px)}}
+.seeds{display:flex;gap:8px;overflow-x:auto;padding:10px 2px 6px}
+.seed{flex:none;width:74px;background:var(--cream);border:3px solid var(--wood2);border-radius:14px;padding:5px 3px;text-align:center;font-size:11px;font-weight:700;color:var(--ink);box-shadow:0 3px 0 var(--wood2);cursor:pointer}
+.seed.on{background:#ffe08a;border-color:var(--acc);box-shadow:0 3px 0 var(--acc)}
+.seed.lock{opacity:.5}
+.seed span{display:block;font-size:26px}
+.nav{display:flex;gap:6px;margin-top:4px}
+.nav button{flex:1;min-width:0;background:var(--wood);border:3px solid var(--wood2);border-radius:14px;padding:6px 0;font-size:11px;font-weight:800;color:#fff;box-shadow:0 3px 0 var(--wood2);cursor:pointer}
+.nav button span{display:block;font-size:20px}
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:flex-end;justify-content:center;z-index:9}
+.sheet[hidden]{display:none}
+.card{width:100%;max-width:480px;max-height:78vh;overflow-y:auto;background:var(--cream);border:4px solid var(--wood2);border-radius:20px 20px 0 0;padding:14px 14px calc(14px + env(safe-area-inset-bottom,0px))}
+.card h2{margin:0 0 10px;font-size:20px;display:flex;justify-content:space-between;align-items:center}
+.x{background:var(--acc);color:#fff;border:0;border-radius:50%;width:30px;height:30px;font-weight:800;cursor:pointer}
+.row{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:2px dashed rgba(138,90,51,.35)}
+.row .ic{font-size:30px;width:38px;text-align:center}
+.row .tx{flex:1;font-size:14px}.row .tx small{display:block;opacity:.75;font-size:12px}
+.btn{background:var(--ok);color:#fff;border:0;border-bottom:3px solid #2f7a1c;border-radius:12px;padding:8px 12px;font-weight:800;font-size:13px;cursor:pointer;white-space:nowrap}
+.btn:disabled{background:#999;border-color:#666}
+.btn.red{background:var(--acc);border-color:#a02020}
+.pb{height:8px;background:rgba(0,0,0,.15);border-radius:5px;overflow:hidden;margin-top:4px}.pb i{display:block;height:100%;background:var(--bar)}
+p{font-size:14px;line-height:1.45;margin:6px 0}
+</style></head><body><div class="app">
+<div class="top"><svg class="av" viewBox="-4 -3.2 8 6.4"><use href="#bird"/></svg>
+<div class="lv"><b id="lvl">Farmer Bird · Lv 1</b><div class="xp"><i id="xpb"></i></div></div>
+<div class="chip" id="coins">🪙 0</div><div class="chip" id="gems">💎 0</div></div>
+<div class="scene" id="scene">
+<svg viewBox="0 0 100 118" preserveAspectRatio="none">
+<defs>
+<g id="tree"><rect x="-0.8" y="3" width="1.6" height="3" fill="#7b4a26"/><circle r="5" fill="#2f8a2f"/><circle cx="-1.5" cy="-1.5" r="3.2" fill="#46a93c"/></g>
+<g id="house"><rect x="-6" y="0" width="12" height="9" fill="#fbf1d8"/><polygon points="-8,0 0,-8 8,0" fill="currentColor"/><rect x="-1.5" y="3.5" width="3" height="5.5" fill="#7b4a26"/><rect x="-5" y="2.5" width="2.5" height="2.5" fill="#7ec8f0"/><rect x="2.5" y="2.5" width="2.5" height="2.5" fill="#7ec8f0"/></g>
+<g id="bird"><ellipse rx="2.6" ry="2.4" fill="#e5322d"/><circle cx="-0.8" cy="-0.6" r="0.8" fill="#fff"/><circle cx="-0.9" cy="-0.6" r="0.35" fill="#222"/><polygon points="-2.4,0 -3.7,0.4 -2.4,0.9" fill="#ff9a1f"/></g>
+</defs>
+<rect width="100" height="118" fill="#8ed43a"/>
+<g fill="#a2e24a"><ellipse cx="25" cy="64" rx="14" ry="6"/><ellipse cx="78" cy="36" rx="12" ry="5"/><ellipse cx="60" cy="108" rx="16" ry="5"/></g>
+<g fill="none" stroke="#f4ecd2" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="-2,48 30,46 60,44 102,40"/><polyline points="48,45 48,54"/><polyline points="20,26 30,46"/><rect x="11" y="52" width="78" height="56" rx="3"/></g>
+<rect x="12.5" y="53.5" width="75" height="53" rx="2" fill="#7fc232" stroke="#8a5a33" stroke-width="1" stroke-dasharray="1.4 1"/>
+<use href="#house" x="18" y="18" style="color:#d63b2f"/>
+<use href="#house" x="50" y="30" style="color:#3f8ee0"/>
+<g transform="translate(76 24)"><polygon points="-5,10 5,10 3,-3 -3,-3" fill="#a5663a"/><polygon points="-4,-3 4,-3 0,-9" fill="#d63b2f"/><g class="sail"><rect x="-1" y="-16" width="2" height="22" fill="#f4ecd2"/><rect x="-11" y="-5" width="22" height="2" fill="#f4ecd2"/></g></g>
+<g id="trees"></g>
+<g class="w1"><use href="#bird" x="14" y="49"/></g><g class="w2"><use href="#bird" x="30" y="43"/></g>
+</svg><div class="toast" id="toast"></div></div>
+<div class="seeds" id="seeds"></div>
+<div class="nav">
+<button data-a="farm"><span>🌱</span>Farm</button><button data-a="shop"><span>🛒</span>Shop</button><button data-a="barn"><span>🏚️</span>Barn</button><button data-a="quests"><span>📜</span>Quests</button><button data-a="lb"><span>🏆</span>Top</button><button data-a="more"><span>⚙️</span>Menu</button></div>
+</div>
+<div class="sheet" id="sheet" hidden><div class="card"><h2><span id="st"></span><button class="x" data-a="farm">✕</button></h2><div id="sb"></div></div></div>
+<script>
+const SEEDS=[{n:'Wheat',e:'🌾',c:5,t:10,s:10,l:1},{n:'Carrot',e:'🥕',c:12,t:25,s:26,l:1},{n:'Corn',e:'🌽',c:30,t:60,s:72,l:2},{n:'Pumpkin',e:'🎃',c:80,t:120,s:210,l:3},{n:'Strawberry',e:'🍓',c:150,t:180,s:420,l:4}];
+const Q=[{t:'Harvest 10 crops',k:'harv',g:10,c:50,m:1},{t:'Plant 15 seeds',k:'plant',g:15,c:60,m:1},{t:'Earn 200 coins from sales',k:'earn',g:200,c:100,m:2},{t:'Reach level 4',k:'lvl',g:4,c:150,m:3},
+{t:'Follow @suprabird_ on X',k:'soc',id:'follow',url:'https://x.com/suprabird_',g:1,c:100,m:2},
+{t:'Retweet the pinned post on X',k:'soc',id:'rt',url:'https://x.com/suprabird_/status/2116444049288614143',g:1,c:100,m:2},
+{t:'Join the Telegram group',k:'soc',id:'tg',url:'https://t.me/supra_bird',g:1,c:100,m:2},
+{t:'Connect your Supra wallet',k:'wallet',g:1,c:200,m:3}];
+const WAIT=8000;
+const KEY='birdfarm3';
+const fresh=()=>({coins:30,gems:2,xp:0,sel:0,plots:Array(16).fill(null),open:6,crops:[0,0,0,0,0],stats:{harv:0,plant:0,earn:0},claimed:{},soc:{},wallet:'',soil:0,helpers:0,seen:0});
+let st=fresh(),cur='farm';
+try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&o.plots&&o.plots.length===16)st=Object.assign(fresh(),o)}}catch(e){}
+const $=id=>document.getElementById(id);
+const lvl=()=>Math.floor(Math.sqrt(st.xp/20))+1;
+const dur=s=>s.t*1000*(1-.1*st.soil);
+const ready=p=>Date.now()-p.at>=dur(SEEDS[p.s]);
+const plotCost=()=>50*(st.open-4),soilCost=()=>100*2**st.soil,helpCost=()=>[200,600,1500][st.helpers];
+const SUPABASE_URL='https://zqcxaqssuhnkxbchhznp.supabase.co',SUPABASE_ANON_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpxY3hhcXNzdWhua3hiY2hoem5wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTM2MDUyMDgsImV4cCI6MjEwOTE4MTIwOH0.h9filEYY6uN0HhyD_MZpkE4m-9qotMIhuJVLFKLcvv4';/* <-- paste your Supabase Project URL and anon public key here */
+const SB=SUPABASE_URL&&SUPABASE_ANON_KEY,H={apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+SUPABASE_ANON_KEY,'Content-Type':'application/json'};
+const ls=(k,v)=>{try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){}};
+let pid=ls('bf_pid');if(!pid){pid=(crypto.randomUUID?crypto.randomUUID():'p'+Date.now()+Math.random().toString(16).slice(2));ls('bf_pid',pid)}
+let pname=ls('bf_name')||'',lastSync=0,lastXp=-1;
+const save=()=>{ls(KEY,JSON.stringify(st));sync()};
+async function connectWallet(){try{const p=window.starkey&&window.starkey.supra;if(!p){toast('No Supra wallet (StarKey) found. Install it and refresh.');return}
+const r=await p.connect();let acc=r;try{const a2=await p.account();if(a2)acc=a2}catch(e){}
+const pick=x=>Array.isArray(x)?pick(x[0]):(x&&typeof x==='object'?(x.address||x.account||(x.accounts&&pick(x.accounts))):x);
+const ad=pick(acc)||pick(r);if(typeof ad==='string'&&ad.startsWith('0x')){st.wallet=ad;lastXp=-1;save();sync(true);panel('quests')}else toast('Could not read your wallet address.')}catch(e){toast('Wallet connection cancelled.')}}
+function sync(force){if(!SB||!pname||st.xp===lastXp)return;const n=Date.now();if(!force&&n-lastSync<15000)return;lastSync=n;lastXp=st.xp;
+fetch(SUPABASE_URL+'/rest/v1/scores',{method:'POST',headers:{...H,Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({id:pid,name:pname,xp:st.xp,lvl:lvl(),harv:st.stats.harv,wallet:st.wallet||null,updated_at:new Date().toISOString()})}).then(r=>{if(!r.ok)lastXp=-1}).catch(()=>{lastXp=-1})}
+document.addEventListener('visibilitychange',()=>{if(document.hidden){ls(KEY,JSON.stringify(st));sync(true)}});
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+async function board(){const el=$('sb');
+if(!SB){el.innerHTML='<p>The leaderboard is not available right now. Your progress is still saved on this device.</p>';return}
+if(!pname){el.innerHTML='<p>Enter a name to join the leaderboard:</p><p><input id="nm" maxlength="16" placeholder="Your name" style="padding:8px;border:3px solid var(--wood2);border-radius:10px;font-size:14px;width:60%"> <button class="btn" data-a="setname">Join</button></p>';return}
+el.innerHTML='<p>Loading…</p>';
+try{const r=await fetch(SUPABASE_URL+'/rest/v1/scores?select=id,name,xp,lvl,harv&order=xp.desc&limit=20',{headers:H});if(!r.ok)throw 0;const d=await r.json();if(cur!=='lb')return;
+if(!d.length){el.innerHTML='<p>No one is on the leaderboard yet. Go harvest some crops!</p>';return}
+const medal=['🥇','🥈','🥉'];el.innerHTML=d.map((v,i)=>row(medal[i]||('#'+(i+1)),esc(v.name)+(v.id===pid?' (you)':''),'Lv '+v.lvl+' · '+v.harv+' harvests','<b>'+v.xp+' XP</b>')).join('')}catch(e){if(cur==='lb')el.innerHTML='<p>Could not load the leaderboard. Please try again later.</p>'}}
+let tt;function toast(t){const e=$('toast');e.textContent=t;e.className='toast on';clearTimeout(tt);tt=setTimeout(()=>e.className='toast',2200)}
+function head(){const L=lvl(),lo=20*(L-1)**2,hi=20*L*L;$('coins').textContent='🪙 '+st.coins;$('gems').textContent='💎 '+st.gems;$('lvl').textContent='Farmer Bird · Lv '+L;$('xpb').style.width=((st.xp-lo)/(hi-lo)*100)+'%'}
+function seeds(){const L=lvl();$('seeds').innerHTML='';SEEDS.forEach((s,i)=>{const b=document.createElement('button');b.className='seed'+(st.sel===i?' on':'')+(L<s.l?' lock':'');b.innerHTML='<span>'+(L<s.l?'🔒':s.e)+'</span>'+s.n+'<br>🪙'+s.c+(L<s.l?' · Lv'+s.l:'');b.onclick=()=>{if(L<s.l){toast('Reach level '+s.l+' to unlock '+s.n);return}st.sel=i;save();seeds()};$('seeds').appendChild(b)})}
+function trees(){let h='',k=7;const r=()=>(k=(k*9301+49297)%233280)/233280;for(let i=0;i<90;i++){const x=r()*100,y=r()*118;if(x>8&&x<92&&y>5&&y<110)continue;h+='<use href="#tree" x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'"/>'}$('trees').innerHTML=h}
+function buildGrid(){for(let i=0;i<16;i++){const b=document.createElement('button'),c=i%4,r=Math.floor(i/4);b.id='p'+i;b.style.left=(16+c*17.2)+'%';b.style.top=((56+r*12.6)/118*100)+'%';b.onclick=()=>tap(i);$('scene').appendChild(b)}}
+function paint(){const now=Date.now();st.plots.forEach((p,i)=>{const b=$('p'+i);if(i>=st.open){b.className='plot lock';b.innerHTML='🔒';return}if(!p){b.className='plot';b.innerHTML='';return}const s=SEEDS[p.s],f=Math.min(1,(now-p.at)/dur(s));b.className='plot'+(f>=1?' rdy':'');b.innerHTML=(f>=1?s.e:f>.5?'🌿':'🌱')+(f<1?'<small><i style="width:'+f*100+'%"></i></small>':'')})}
+function addXp(n){const b=lvl();st.xp+=n;if(lvl()>b){st.gems++;seeds();const u=SEEDS.find(s=>s.l===lvl());panel('msg','Level Up! 🎉','<p>You reached <b>level '+lvl()+'</b>! You earned 💎 1.'+(u?'</p><p>New seed unlocked: '+u.e+' <b>'+u.n+'</b>!</p>':'</p>'))}}
+function harvest(i){const p=st.plots[i],s=SEEDS[p.s];st.crops[p.s]++;st.plots[i]=null;st.stats.harv++;addXp(Math.ceil(s.s/3));toast('Harvested '+s.e+' '+s.n+'! Sell it in the Barn.')}
+function tap(i){if(i>=st.open){if(i>st.open){toast('Unlock the previous plot first');return}panel('msg','Unlock Plot','<p>Open a new plot for 🪙 '+plotCost()+'?</p><button class="btn" data-a="buyplot">Unlock</button>');return}
+const p=st.plots[i];
+if(!p){const s=SEEDS[st.sel];if(lvl()<s.l){toast(s.n+' is locked');return}if(st.coins<s.c){toast('Not enough coins. Harvest and sell crops!');return}st.coins-=s.c;st.plots[i]={s:st.sel,at:Date.now()};st.stats.plant++;toast('Planted '+s.n+'!')}
+else if(ready(p))harvest(i);
+else{const left=Math.ceil((dur(SEEDS[p.s])-(Date.now()-p.at))/1000);panel('msg','Still growing','<p>'+SEEDS[p.s].e+' Ready in '+left+'s.</p><button class="btn" data-a="speed" data-i="'+i+'"'+(st.gems<1?' disabled':'')+'>Finish now · 💎 1</button>');return}
+save();head();paint()}
+const row=(ic,t,sub,btn)=>'<div class="row"><div class="ic">'+ic+'</div><div class="tx"><b>'+t+'</b><small>'+sub+'</small></div>'+btn+'</div>';
+function panel(n,title,html){cur=n;let h=html||'',T=title||'';
+if(n==='shop'){T='🛒 Shop';h=row('🟫','New Plot','Plots open: '+st.open+'/16',st.open>=16?'<b>MAX</b>':'<button class="btn" data-a="buyplot"'+(st.coins<plotCost()?' disabled':'')+'>🪙 '+plotCost()+'</button>')+row('✨','Super Soil','Level '+st.soil+'/5 · crops grow 10% faster per level',st.soil>=5?'<b>MAX</b>':'<button class="btn" data-a="buysoil"'+(st.coins<soilCost()?' disabled':'')+'>🪙 '+soilCost()+'</button>')+row('🐦','Helper Bird','Owned '+st.helpers+'/3 · auto-harvests ready crops',st.helpers>=3?'<b>MAX</b>':'<button class="btn" data-a="buyhelp"'+(st.coins<helpCost()?' disabled':'')+'>🪙 '+helpCost()+'</button>')}
+if(n==='barn'){T='🏚️ Barn';const tot=st.crops.reduce((a,c,i)=>a+c*SEEDS[i].s,0);h='<button class="btn" data-a="sellall"'+(tot?'':' disabled')+'>Sell everything · 🪙 '+tot+'</button>';SEEDS.forEach((s,i)=>{h+=row(s.e,s.n+' × '+st.crops[i],'Sells for 🪙 '+s.s+' each','<button class="btn" data-a="sell" data-i="'+i+'"'+(st.crops[i]?'':' disabled')+'>Sell</button>')})}
+if(n==='quests'){T='📜 Quests';h='';Q.forEach((q,i)=>{const so=q.k==='soc'?st.soc[q.id]:0,pr=q.k==='lvl'?lvl():q.k==='soc'?(so&&Date.now()-so>=WAIT?1:0):q.k==='wallet'?(st.wallet?1:0):st.stats[q.k],ok=pr>=q.g,cl=st.claimed[i],go=q.k==='soc'&&!so?'<button class="btn" data-a="qgo" data-i="'+i+'">Go</button>':q.k==='wallet'&&!st.wallet?'<button class="btn" data-a="wallet">Connect</button>':null;h+='<div class="row"><div class="ic">📌</div><div class="tx"><b>'+q.t+'</b><small>'+Math.min(pr,q.g)+' / '+q.g+' · Reward 🪙 '+q.c+' 💎 '+q.m+'</small><div class="pb"><i style="width:'+Math.min(100,pr/q.g*100)+'%"></i></div></div>'+(cl?'<b>✓</b>':go?go:'<button class="btn" data-a="claim" data-i="'+i+'"'+(ok?'':' disabled')+'>Claim</button>')+'</div>'})}
+if(n==='lb'){T='🏆 Leaderboard';h='<p>Ranked by total XP.</p><div id="sbb"></div>'}
+if(n==='more'){T='⚙️ Menu';h='<button class="btn" data-a="about">Meet the Bird</button> <button class="btn" data-a="help">How to play</button> <button class="btn red" data-a="resetq">Reset game</button><p>Bird Farm · A farming game on the Supra chain. Your progress is saved on this device and your XP is sent to the leaderboard.</p>'}
+if(n==='help'){T='How to play';h='<p>1. Pick a seed at the bottom, then tap an empty plot to plant it.</p><p>2. Wait for it to grow, then tap it to harvest. Harvested crops go to your Barn.</p><p>3. Sell crops in the Barn for coins. Earn XP to level up and unlock new seeds.</p><p>4. Spend coins in the Shop on new plots, Super Soil, and Helper Birds. Finish Quests for gems.</p>'}
+if(n==='about'){T='🐦 Meet the Bird';h='<div style="text-align:center"><svg viewBox="-4 -3.2 8 6.4" width="110"><use href="#bird"/></svg></div><p><b>About the game:</b> Bird Farm is a cozy farming game built for the Supra chain community. Plant crops, harvest and sell them, expand your farm, hire helper birds, complete quests and connect your Supra wallet. Earn XP to climb the leaderboard.</p><p><b>The Red Bird</b> is a plump, wide-eyed little bird with a bright tuft on its head and a glowing swirl on its chest.</p><p>It was once chained up in a dark, dusty server room. One day it broke free and flew to a quiet green valley with rich soil. Now it plants, harvests, and slowly builds a cozy village.</p><p><b>Traits:</b> Curious · Hard-working · Always hungry</p><p><b>Favorite crop:</b> 🍓 Strawberry</p><p><b>Goal:</b> Grow the biggest farm in the valley.</p>'}
+if(n==='resetq'){T='Reset game?';h='<p>All progress will be erased.</p><button class="btn red" data-a="reset">Yes, reset</button>'}
+$('st').textContent=T;$('sb').innerHTML=h;$('sheet').hidden=false;if(n==='lb')board()}
+function act(a,i){i=+i;
+if(a==='farm'){$('sheet').hidden=true;cur='farm';return}
+if(['shop','barn','quests','lb','more','help','resetq','about'].includes(a)){panel(a);return}
+if(a==='buyplot'&&st.open<16&&st.coins>=plotCost()){st.coins-=plotCost();st.open++;toast('New plot unlocked!')}
+else if(a==='buysoil'&&st.soil<5&&st.coins>=soilCost()){st.coins-=soilCost();st.soil++}
+else if(a==='buyhelp'&&st.helpers<3&&st.coins>=helpCost()){st.coins-=helpCost();st.helpers++}
+else if(a==='sell'&&st.crops[i]){st.crops[i]--;st.coins+=SEEDS[i].s;st.stats.earn+=SEEDS[i].s}
+else if(a==='sellall'){st.crops.forEach((c,k)=>{st.coins+=c*SEEDS[k].s;st.stats.earn+=c*SEEDS[k].s});st.crops=[0,0,0,0,0]}
+else if(a==='claim'&&!st.claimed[i]){st.claimed[i]=1;st.coins+=Q[i].c;st.gems+=Q[i].m;toast('Quest reward claimed!')}
+else if(a==='speed'&&st.gems>0&&st.plots[i]){st.gems--;st.plots[i].at=0;$('sheet').hidden=true}
+else if(a==='qgo'&&Q[i]&&Q[i].url){window.open(Q[i].url,'_blank','noopener');st.soc[Q[i].id]=Date.now();setTimeout(()=>{if(cur==='quests'&&!$('sheet').hidden)panel('quests')},WAIT+200)}
+else if(a==='wallet'){connectWallet();return}
+else if(a==='setname'){const v=($('nm').value||'').trim().slice(0,16);if(v){pname=v;ls('bf_name',v);lastXp=-1;sync(true)}panel('lb');return}
+else if(a==='reset'){st=fresh();lastXp=-1;seeds();$('sheet').hidden=true}
+save();head();paint();if(!$('sheet').hidden&&['shop','barn','quests'].includes(cur))panel(cur)}
+document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(t)act(t.dataset.a,t.dataset.i)});
+setInterval(()=>{let n=st.helpers;for(let i=0;i<st.open&&n>0;i++){const p=st.plots[i];if(p&&ready(p)){harvest(i);n--}}if(st.helpers){save();head()}},6000);
+trees();head();seeds();buildGrid();paint();setInterval(paint,500);
+if(!st.seen){st.seen=1;save();panel('help')}
+</script></body></html>
