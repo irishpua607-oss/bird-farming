@@ -479,14 +479,49 @@ let BB=null,BBat='';
 async function birdBal(addr){try{const r=await fetch('https://rpc-mainnet.supra.com/rpc/v3/view',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({function:'0x1::primary_fungible_store::balance',type_arguments:['0x1::fungible_asset::Metadata'],arguments:[addr,BIRD_META]}),signal:window.AbortSignal&&AbortSignal.timeout?AbortSignal.timeout(5000):undefined});const j=await r.json();const v=j&&j.result&&j.result[0];return v==null?null:Number(v)/1e6}catch(e){return null}}
 async function refreshBird(){if(!st.wallet)return;const b=await birdBal(st.wallet);if(b!==null){BB=b;BBat=st.wallet}}
 const birdLine=()=>BB===null||BBat!==st.wallet?'':'<p><small>BIRD in your wallet: <b>'+nb(BB)+'</b></small></p>';
-let BQ=null,SELLP=0,SELLFEE=0,SELLMAX=0,SELLBUSY=false;
+let BQ=null,SELLP=0,SELLFEE=0,SELLMAX=0,SELLBUSY=false,BUYBUSY=false,MANUAL=false,LASTTX='';
 function updSellEst(){const e=$('sellest'),i=$('sellg');if(!e||!i)return;const g=parseFloat(i.value);e.textContent='You get ≈ '+nb(g>0?g*SELLP*(1-SELLFEE):0)+' BIRD'}
 document.addEventListener('input',e=>{if(e.target&&e.target.id==='sellg')updSellEst()});
+// Pay with wallet: builds the BIRD transfer to the treasury; the wallet shows it and the player confirms
+async function payBird(q){
+const p=await waitProvider();if(!p)throw new Error('StarKey wallet not found');
+await ensureConnected(p);
+const h64=a=>String(a).toLowerCase().replace(/^0x/,'').padStart(64,'0');
+const ab=h=>Uint8Array.from(h.match(/.{2}/g).map(b=>parseInt(b,16)));
+let amt=BigInt(Math.round(+q.total_bird*1e6));const u64=new Uint8Array(8);for(let i=0;i<8;i++){u64[i]=Number(amt&0xffn);amt>>=8n}
+const payload=[st.wallet,0,'0000000000000000000000000000000000000000000000000000000000000001','primary_fungible_store','transfer',['0x1::fungible_asset::Metadata'],[ab(h64(BIRD_META)),ab(h64(q.treasury)),u64],{txExpiryTime:Math.ceil(Date.now()/1000)+300}];
+const data=await p.createRawTransactionData(payload);
+if(!data)throw new Error('Wallet could not prepare the payment');
+const r=await p.sendTransaction({data});
+let h=typeof r==='string'?r:(r&&(r.hash||r.txHash||r.transactionHash||(r.result&&(typeof r.result==='string'?r.result:(r.result.hash||r.result.txHash)))));
+h=String(h||'').trim().toLowerCase();if(h&&!h.startsWith('0x'))h='0x'+h;
+if(!/^0x[0-9a-f]{64}$/.test(h))throw new Error('Wallet did not return a transaction hash');
+return h}
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+async function buyNow(g){
+if(BUYBUSY)return;BUYBUSY=true;MANUAL=false;LASTTX='';
+try{
+toast('Preparing your purchase…');
+const r=await trade('quote',{gems:g});BQ=r.quote;
+if(BB!==null&&BBat===st.wallet&&BB<+BQ.total_bird){const need=BQ.total_bird;BQ=null;BUYBUSY=false;toast('Not enough BIRD. You need '+nb(need)+' BIRD.');return}
+toast('Confirm '+nb(BQ.total_bird)+' BIRD in your wallet');
+let h;
+try{h=await payBird(BQ)}catch(e){
+const m=String((e&&e.message)||e);
+if(/reject|cancel|denied|declin|refus/i.test(m)){BQ=null;BUYBUSY=false;toast('Payment cancelled.');return}
+MANUAL=true;BUYBUSY=false;loadInvest('Wallet payment is not available here ('+m+'). You can still send the BIRD manually.');return}
+LASTTX=h;toast('Payment sent. Verifying…');
+let lastErr='';
+for(let i=0;i<12;i++){
+try{await trade('buy',{quote_id:BQ.id,tx:h});BQ=null;LASTTX='';BUYBUSY=false;refreshBird();loadInvest('Purchase confirmed. Gems added.');return}
+catch(e){lastErr=String((e&&e.message)||e);if(/not found yet|try again|could not check/i.test(lastErr)){await sleep(3000);continue}break}}
+MANUAL=true;BUYBUSY=false;loadInvest('Payment sent but not verified yet: '+lastErr+' Paste the hash and press Verify.');
+}catch(e){BUYBUSY=false;BQ=null;toast(String((e&&e.message)||e))}}
 function buyRow(s){
 if(!s.can_buy)return row('🛒','Buy gems','Buying is not open for your wallet yet.','<button class="btn" disabled>Soon</button>');
 const tx=(s.buy_tax_bps/100)+'% tax';
-if(BQ&&new Date(BQ.expires_at).getTime()>Date.now())return row('🛒','Pay '+(+BQ.total_bird)+' BIRD','Send exactly this amount of BIRD from your connected wallet to the address below, then paste the transaction hash. Quote valid until '+new Date(BQ.expires_at).toLocaleTimeString()+'.'+(BB!==null&&BBat===st.wallet&&BB<BQ.total_bird?' <b>Your wallet has only '+nb(BB)+' BIRD.</b>':'')+'<br><small style="word-break:break-all"><b>'+eh(BQ.treasury)+'</b></small>','<input id="txh" placeholder="0x… tx hash"><br><button class="btn" data-a="ibuy">Verify</button>');
-return row('🛒','Buy gems','Min '+s.buy_min_gems+' · max '+s.buy_max_gems+' 💎. You send BIRD, then paste the transaction hash.','<input id="buyg" type="number" min="'+s.buy_min_gems+'" step="any" placeholder="Gems"><br><button class="btn" data-a="iquote">Get quote</button>');}
+if(BQ&&MANUAL)return row('🛒','Pay '+(+BQ.total_bird)+' BIRD','Send exactly this amount of BIRD from your connected wallet to the address below, then paste the transaction hash. Quote valid until '+new Date(BQ.expires_at).toLocaleTimeString()+'.'+(BB!==null&&BBat===st.wallet&&BB<BQ.total_bird?' <b>Your wallet has only '+nb(BB)+' BIRD.</b>':'')+'<br><small style="word-break:break-all"><b>'+eh(BQ.treasury)+'</b></small>','<input id="txh" placeholder="0x… tx hash" value="'+eh(LASTTX)+'"><br><button class="btn" data-a="ibuy">Verify</button>');
+return row('🛒','Buy gems','Min '+s.buy_min_gems+' · max '+s.buy_max_gems+' 💎. Your wallet will ask you to confirm the payment.','<input id="buyg" type="number" min="'+s.buy_min_gems+'" step="any" placeholder="Gems"><br><button class="btn" data-a="ibuynow">Buy</button>');}
 function invHtml(s,msg){let h=msg?'<p><b>'+eh(msg)+'</b></p>':'';const gp=s.price&&+s.price.bird_per_gem?+s.price.bird_per_gem:0;
 if(!s.investor)return h+'<p><b>Early Birds only.</b> The Nest is for wallets that bought 💎 gems with BIRD. Free players farm and keep their gems in the game.</p>'+buyRow(s);
 h+=row('💎','Your paid gems','1 💎 ≈ '+(gp?nb(gp)+' BIRD':'…')+' (live price)','<b>'+fmt(s.paid_gems)+'</b>');
@@ -643,6 +678,7 @@ else if(a==='wallet'){connectWallet();return}
 else if(a==='login'){loginFailed=false;login().then(()=>{toast('Signed in');loadInvest()}).catch(e=>toast(e.message||'Sign-in cancelled'));return}
 else if(a==='sellmax'){const e=$('sellg');if(e){e.value=SELLMAX;updSellEst()}return}
 else if(a==='isell'){if(SELLBUSY)return;const g=parseFloat(($('sellg')||{}).value);if(!(g>0)){toast('Enter how many gems to sell');return}if(g>SELLMAX+1e-9){toast('You only have '+SELLMAX+' 💎 to sell');return}SELLBUSY=true;trade('sell',{gems:g}).then(()=>{SELLBUSY=false;loadInvest('Sell request sent. It is paid to your wallet after review.')}).catch(e=>{SELLBUSY=false;toast(e.message)});return}
+else if(a==='ibuynow'){const g=parseFloat(($('buyg')||{}).value);if(!(g>0)){toast('Enter how many gems to buy');return}buyNow(g);return}
 else if(a==='iquote'){const g=parseFloat(($('buyg')||{}).value);if(!(g>0)){toast('Enter how many gems to buy');return}trade('quote',{gems:g}).then(r=>{BQ=r.quote;loadInvest()}).catch(e=>toast(e.message));return}
 else if(a==='ibuy'){const t=(($('txh')||{}).value||'').trim();if(!BQ||!t){toast('Paste the transaction hash');return}trade('buy',{quote_id:BQ.id,tx:t}).then(()=>{BQ=null;loadInvest('Purchase confirmed. Gems added.')}).catch(e=>toast(e.message));return}
 else if(a==='iclaim'){trade('claim').then(()=>loadInvest('Claim request sent. It is paid to your wallet after review.')).catch(e=>toast(e.message));return}
