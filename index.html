@@ -498,6 +498,8 @@ h=String(h||'').trim().toLowerCase();if(h&&!h.startsWith('0x'))h='0x'+h;
 if(!/^0x[0-9a-f]{64}$/.test(h))throw new Error('Wallet did not return a transaction hash');
 return h}
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+// Credits the purchased gems to the in-game balance once per tx hash (server already credited paid_gems)
+function creditLocal(q,h){try{h=String(h||'').toLowerCase();const g=+(q&&q.gems);if(!h||!(g>0))return;let d=[];try{d=JSON.parse(ls('bf_cr')||'[]')}catch(e){}if(d.includes(h))return;d.push(h);ls('bf_cr',JSON.stringify(d.slice(-50)));st.gems=R4(st.gems+g);save();head()}catch(e){}}
 async function buyNow(g){
 if(BUYBUSY)return;BUYBUSY=true;MANUAL=false;LASTTX='';
 try{
@@ -513,7 +515,7 @@ MANUAL=true;BUYBUSY=false;loadInvest('Wallet payment is not available here ('+m+
 LASTTX=h;toast('Payment sent. Verifying…');
 let lastErr='';
 for(let i=0;i<12;i++){
-try{await trade('buy',{quote_id:BQ.id,tx:h});BQ=null;LASTTX='';BUYBUSY=false;refreshBird();loadInvest('Purchase confirmed. Gems added.');return}
+try{await trade('buy',{quote_id:BQ.id,tx:h});creditLocal(BQ,h);BQ=null;LASTTX='';BUYBUSY=false;refreshBird();loadInvest('Purchase confirmed. Gems added.');return}
 catch(e){lastErr=String((e&&e.message)||e);if(/not found yet|try again|could not check/i.test(lastErr)){await sleep(3000);continue}break}}
 MANUAL=true;BUYBUSY=false;loadInvest('Payment sent but not verified yet: '+lastErr+' Paste the hash and press Verify.');
 }catch(e){BUYBUSY=false;BQ=null;toast(String((e&&e.message)||e))}}
@@ -680,7 +682,7 @@ else if(a==='sellmax'){const e=$('sellg');if(e){e.value=SELLMAX;updSellEst()}ret
 else if(a==='isell'){if(SELLBUSY)return;const g=parseFloat(($('sellg')||{}).value);if(!(g>0)){toast('Enter how many gems to sell');return}if(g>SELLMAX+1e-9){toast('You only have '+SELLMAX+' 💎 to sell');return}SELLBUSY=true;trade('sell',{gems:g}).then(()=>{SELLBUSY=false;loadInvest('Sell request sent. It is paid to your wallet after review.')}).catch(e=>{SELLBUSY=false;toast(e.message)});return}
 else if(a==='ibuynow'){const g=parseFloat(($('buyg')||{}).value);if(!(g>0)){toast('Enter how many gems to buy');return}buyNow(g);return}
 else if(a==='iquote'){const g=parseFloat(($('buyg')||{}).value);if(!(g>0)){toast('Enter how many gems to buy');return}trade('quote',{gems:g}).then(r=>{BQ=r.quote;loadInvest()}).catch(e=>toast(e.message));return}
-else if(a==='ibuy'){const t=(($('txh')||{}).value||'').trim();if(!BQ||!t){toast('Paste the transaction hash');return}trade('buy',{quote_id:BQ.id,tx:t}).then(()=>{BQ=null;loadInvest('Purchase confirmed. Gems added.')}).catch(e=>toast(e.message));return}
+else if(a==='ibuy'){const t=(($('txh')||{}).value||'').trim();if(!BQ||!t){toast('Paste the transaction hash');return}const q=BQ;trade('buy',{quote_id:BQ.id,tx:t}).then(()=>{creditLocal(q,t);BQ=null;loadInvest('Purchase confirmed. Gems added.')}).catch(e=>toast(e.message));return}
 else if(a==='iclaim'){trade('claim').then(()=>loadInvest('Claim request sent. It is paid to your wallet after review.')).catch(e=>toast(e.message));return}
 else if(a==='disconnect'){disconnectWallet();return}
 else if(a==='trade'){window.open(TRADE_URL,'_blank','noopener');return}
