@@ -139,38 +139,59 @@ const ls=(k,v)=>{try{if(v===undefined)return localStorage.getItem(k);localStorag
 let pid=ls('bf_pid');if(!pid){pid=(crypto.randomUUID?crypto.randomUUID():'p'+Date.now()+Math.random().toString(16).slice(2));ls('bf_pid',pid)}
 let pname=ls('bf_name')||'',lastSync=0,lastXp=-1;
 const save=()=>{ls(KEY,JSON.stringify(st));sync()};
-async function connectWallet(){try{const p=window.starkey&&window.starkey.supra;if(!p){toast('No Supra wallet (StarKey) found. Install it and refresh.');return}
-const r=await p.connect();let acc=r;try{const a2=await p.account();if(a2)acc=a2}catch(e){}
+const addrOf=x=>Array.isArray(x)?addrOf(x[0]):(x&&typeof x==='object'?(x.address||x.account||(x.accounts&&addrOf(x.accounts))):x);
+async function waitProvider(ms){ms=ms==null?4000:ms;const t=Date.now();for(;;){const p=window.starkey&&window.starkey.supra;if(p||Date.now()-t>=ms)return p||null;await new Promise(r=>setTimeout(r,200))}}
+async function ensureConnected(p){let a=null;try{a=await p.account()}catch(e){}if(addrOf(a))return a;return await p.connect()}
+async function restoreWallet(){try{const p=await waitProvider(4000);if(!p)return;let a=null;try{a=addrOf(await p.account())}catch(e){}
+if(typeof a==='string'&&a.startsWith('0x')&&!st.wallet){st.wallet=a;save();sync(true)}
+if(p.on)p.on('accountChanged',acc=>{const n=addrOf(acc);if(typeof n==='string'&&n.startsWith('0x')&&nz(n)!==nz(st.wallet)){st.wallet=n;SESS=null;try{localStorage.removeItem('bf_sess')}catch(_){}loginFailed=false;save();if(cur==='invest'&&!$('sheet').hidden)loadInvest()}})}catch(e){}}
+async function connectWallet(){try{const p=await waitProvider();if(!p){toast('No Supra wallet (StarKey) found. Install it and refresh.');return}
+const r=await ensureConnected(p);let acc=r;try{const a2=await p.account();if(a2)acc=a2}catch(e){}
 const pick=x=>Array.isArray(x)?pick(x[0]):(x&&typeof x==='object'?(x.address||x.account||(x.accounts&&pick(x.accounts))):x);
-const ad=pick(acc)||pick(r);if(typeof ad==='string'&&ad.startsWith('0x')){st.wallet=ad;lastXp=-1;save();sync(true);panel('quests');loginFailed=false;autoLogin()}else toast('Could not read your wallet address.')}catch(e){toast('Wallet connection cancelled.')}}
+const ad=pick(acc)||pick(r);if(typeof ad==='string'&&ad.startsWith('0x')){st.wallet=ad;lastXp=-1;save();sync(true);panel(cur==='invest'?'invest':'quests');loginFailed=false;autoLogin()}else toast('Could not read your wallet address.')}catch(e){toast('Wallet connection cancelled.')}}
 const AU=SUPABASE_URL+'/functions/v1/auth',TR=SUPABASE_URL+'/functions/v1/trade';
 let SESS=null;try{SESS=JSON.parse(ls('bf_sess')||'null')}catch(e){}
 const nz=a=>(a||'').toLowerCase().replace(/^0x/,'').replace(/^0+/,''),eh=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])),nb=n=>Math.round(+n||0).toLocaleString('en-US');
 async function fn(u,b){const r=await fetch(u,{method:'POST',headers:H,body:JSON.stringify(b)});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'Request failed');return j}
-async function login(){const p=window.starkey&&window.starkey.supra;if(!p||!st.wallet)throw new Error('Connect your wallet first');
+async function login(){const p=await waitProvider();if(!p)throw new Error('StarKey wallet not detected in this browser. Open the game from the StarKey app browser or a browser with the StarKey extension.');if(!st.wallet)throw new Error('Connect your wallet first');await ensureConnected(p);
 const n=await fn(AU,{action:'nonce',address:st.wallet});const r=await p.signMessage({message:n.message,nonce:n.nonce});
 let inner=r&&r.result&&typeof r.result==='object'?r.result:(r||{});
 if(inner.publicKey==null){try{let a=await p.account();a=Array.isArray(a)?a[0]:a;if(a&&a.publicKey)inner={...inner,publicKey:a.publicKey}}catch(e){}}
 const v=await fn(AU,{action:'verify',nonce:n.nonce,response:inner});SESS={token:v.token,address:v.address};ls('bf_sess',JSON.stringify(SESS))}
-async function trade(action,x){if(!SESS)throw new Error('Sign in first');try{return await fn(TR,{action,token:SESS.token,...x})}catch(e){if(/not logged in/i.test(e.message)){SESS=null;try{localStorage.removeItem('bf_sess')}catch(_){}}throw e}}
+async function trade(action,x,_r){if(!SESS||nz(SESS.address)!==nz(st.wallet))await login();try{return await fn(TR,{action,token:SESS.token,...x})}catch(e){if(/not logged in/i.test(e.message)){SESS=null;try{localStorage.removeItem('bf_sess')}catch(_){}if(!_r)return trade(action,x,1)}throw e}}
+const BIRD_META='0x38eb2b5380cfa493031ed527077598e3024465bd27f09dd0dd86ddcab34f5e81';
+let BB=null,BBat='';
+async function birdBal(addr){try{const r=await fetch('https://rpc-mainnet.supra.com/rpc/v3/view',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({function:'0x1::primary_fungible_store::balance',type_arguments:['0x1::fungible_asset::Metadata'],arguments:[addr,BIRD_META]}),signal:window.AbortSignal&&AbortSignal.timeout?AbortSignal.timeout(5000):undefined});const j=await r.json();const v=j&&j.result&&j.result[0];return v==null?null:Number(v)/1e6}catch(e){return null}}
+async function refreshBird(){if(!st.wallet)return;const b=await birdBal(st.wallet);if(b!==null){BB=b;BBat=st.wallet}}
+const birdLine=()=>BB===null||BBat!==st.wallet?'':'<p><small>BIRD in your wallet: <b>'+nb(BB)+'</b></small></p>';
+let BQ=null,SELLP=0,SELLFEE=0,SELLMAX=0,SELLBUSY=false;
+function updSellEst(){const e=$('sellest'),i=$('sellg');if(!e||!i)return;const g=parseFloat(i.value);e.textContent='You get ≈ '+nb(g>0?g*SELLP*(1-SELLFEE):0)+' BIRD'}
+document.addEventListener('input',e=>{if(e.target&&e.target.id==='sellg')updSellEst()});
+function buyRow(s){
+if(!s.can_buy)return row('🛒','Buy gems','Buying is not open for your wallet yet.','<button class="btn" disabled>Soon</button>');
+const tx=(s.buy_tax_bps/100)+'% tax';
+if(BQ&&new Date(BQ.expires_at).getTime()>Date.now())return row('🛒','Pay '+(+BQ.total_bird)+' BIRD','Send exactly this amount of BIRD from your connected wallet to the address below, then paste the transaction hash. Includes '+tx+'. Quote valid until '+new Date(BQ.expires_at).toLocaleTimeString()+'.'+(BB!==null&&BBat===st.wallet&&BB<BQ.total_bird?' <b>Your wallet has only '+nb(BB)+' BIRD.</b>':'')+'<br><small style="word-break:break-all"><b>'+eh(BQ.treasury)+'</b></small>','<input id="txh" placeholder="0x… tx hash"><br><button class="btn" data-a="ibuy">Verify</button>');
+return row('🛒','Buy gems','Min '+s.buy_min_gems+' · max '+s.buy_max_gems+' 💎 · '+tx+'. You send BIRD, then paste the transaction hash.','<input id="buyg" type="number" min="'+s.buy_min_gems+'" step="any" placeholder="Gems"><br><button class="btn" data-a="iquote">Get quote</button>');}
 function invHtml(s,msg){let h=msg?'<p><b>'+eh(msg)+'</b></p>':'';const gp=s.price&&+s.price.bird_per_gem?+s.price.bird_per_gem:0;
-if(!s.investor)return h+'<p><b>Investors only.</b> Trading is for wallets that bought 💎 gems with BIRD. Free players farm and keep their gems in the game.</p>'+row('🛒','Buy gems','Buying opens soon.','<button class="btn" disabled>Soon</button>');
+if(!s.investor)return h+'<p><b>Investors only.</b> Trading is for wallets that bought 💎 gems with BIRD. Free players farm and keep their gems in the game.</p>'+buyRow(s);
 h+=row('💎','Your paid gems','1 💎 ≈ '+(gp?nb(gp)+' BIRD':'…')+' (live price)','<b>'+fmt(s.paid_gems)+'</b>');
 h+=row('🪙','Rewards ready','Up to 0.1% a day on your paid gems. Not guaranteed: it drops when the reward fund runs low. '+(s.claim_tax_bps/100)+'% tax on claims.','<b>'+nb(s.claimable_bird)+' BIRD</b><br><button class="btn" data-a="iclaim"'+(s.can_claim&&s.claimable_bird>0?'':' disabled')+'>Claim</button>');
-h+=row('💱','Sell gems','You get BIRD at the live price (never above what you paid) minus a '+(s.sell_fee_bps/100)+'% fee, sent to your wallet after review.'+(s.can_sell?'':' <b>Selling is not open yet.</b>'),'<input id="sellg" type="number" min="0" step="any" placeholder="Gems"><br><button class="btn" data-a="isell"'+(s.can_sell&&s.paid_gems>0?'':' disabled')+'>Sell</button>');
-h+=row('🛒','Buy gems','Buying opens soon.','<button class="btn" disabled>Soon</button>');
+SELLP=+s.sell_bird_per_gem||0;SELLFEE=(+s.sell_fee_bps||0)/10000;SELLMAX=+s.paid_gems||0;
+h+=row('💱','Sell gems','You get BIRD at '+(SELLP?nb(SELLP)+' per 💎':'the live price')+' (never above what you paid) minus a '+(s.sell_fee_bps/100)+'% fee, sent to your wallet after review.<br><span id="sellest">You get ≈ 0 BIRD</span>'+(s.can_sell?'':' <b>Selling is not open yet.</b>'),'<input id="sellg" type="number" min="0" step="any" placeholder="Gems"><br><button class="btn" data-a="sellmax"'+(s.can_sell&&s.paid_gems>0?'':' disabled')+'>Max</button> <button class="btn" data-a="isell"'+(s.can_sell&&s.paid_gems>0?'':' disabled')+'>Sell</button>');
+h+=buyRow(s);
 const rec=[...(s.withdrawals||[]).map(w=>'Sell '+fmt(w.gems)+' 💎 · '+nb(w.net_bird)+' BIRD · '+w.status),...(s.claims||[]).map(c=>'Claim '+nb(c.net_bird)+' BIRD · '+c.status)];
 return h+(rec.length?'<p><small>Recent: '+rec.map(eh).join(' | ')+'</small></p>':'')}
-let loginBusy=false,loginFailed=false;
-async function autoLogin(){if(loginBusy)return;loginBusy=true;try{await login();loginFailed=false}catch(e){loginFailed=true}loginBusy=false}
+let loginBusy=false,loginFailed=false,loginErr='';
+async function autoLogin(){if(loginBusy)return;loginBusy=true;try{await login();loginFailed=false;loginErr=''}catch(e){loginFailed=true;loginErr=(e&&e.message)||''}loginBusy=false}
 async function loadInvest(msg){const el=$('inv');if(!el)return;
 if(!st.wallet){el.innerHTML='<p>Investors trade 💎 gems for BIRD here. Connect your Supra wallet to start.</p><button class="btn" data-a="wallet">Connect wallet</button>';return}
+if(BBat!==st.wallet||BB===null)await refreshBird();
 const ok=SESS&&nz(SESS.address)===nz(st.wallet);
 if(!ok){
 if(loginBusy){el.innerHTML='<p>Confirm the sign-in in your wallet…</p>';setTimeout(()=>{if(cur==='invest')loadInvest(msg)},1500);return}
 if(!loginFailed){el.innerHTML='<p>Confirm the sign-in in your wallet…</p>';await autoLogin();if(cur==='invest')return loadInvest(msg);return}
-el.innerHTML=(msg?'<p>'+eh(msg)+'</p>':'')+'<p>Sign-in did not finish. It is free and sends no transaction.</p><button class="btn" data-a="login">Sign in</button>';return}
-try{el.innerHTML=invHtml(await trade('status'),msg)}catch(e){loginFailed=true;el.innerHTML='<p>'+eh(e.message)+'</p><button class="btn" data-a="login">Sign in again</button>'}}
+el.innerHTML=birdLine()+(msg?'<p>'+eh(msg)+'</p>':'')+'<p>Sign-in did not finish'+(loginErr?': '+eh(loginErr):'')+'. It is free and sends no transaction.</p><button class="btn" data-a="login">Sign in</button>';return}
+try{const s=await trade('status');if(s.bird_balance!=null){BB=+s.bird_balance;BBat=st.wallet}el.innerHTML=birdLine()+invHtml(s,msg)}catch(e){loginFailed=true;el.innerHTML='<p>'+eh(e.message)+'</p><button class="btn" data-a="login">Sign in again</button>'}}
 const shortAd=a=>a?a.slice(0,6)+'…'+a.slice(-4):'';
 async function disconnectWallet(){try{const p=window.starkey&&window.starkey.supra;if(p&&typeof p.disconnect==='function'){try{await p.disconnect()}catch(e){}}}catch(e){}
 st.wallet='';SESS=null;loginFailed=false;try{localStorage.removeItem('bf_sess')}catch(e){}lastXp=-1;save();
@@ -209,7 +230,7 @@ else{const left=Math.ceil((dur(SEEDS[p.s])-(Date.now()-p.at))/1000);panel('msg',
 save();head();paint()}
 const row=(ic,t,sub,btn)=>'<div class="row"><div class="ic">'+ic+'</div><div class="tx"><b>'+t+'</b><small>'+sub+'</small></div>'+btn+'</div>';
 function panel(n,title,html){cur=n;let h=html||'',T=title||'';
-if(n==='shop'){T='🛒 Shop';h=row('💎','Buy Gems','1 💎 = $1 in BIRD at the live market rate.<br><span id="gp">'+(GP||'Loading price…')+'</span>','<button class="btn" disabled>Soon</button>')+row('💱','Trade Token','Buy or sell the token on floor.supwars.fun. Trading involves risk.','<button class="btn" data-a="trade">Open</button>')+row('🟫','New Plot','Plots open: '+st.open+'/16',st.open>=16?'<b>MAX</b>':'<button class="btn" data-a="buyplot"'+(st.gems<plotCost()?' disabled':'')+'>💎 '+fmt(plotCost())+'</button>')+row('✨','Super Soil','Level '+st.soil+'/5 · crops grow 10% faster per level',st.soil>=5?'<b>MAX</b>':'<button class="btn" data-a="buysoil"'+(st.gems<soilCost()?' disabled':'')+'>💎 '+fmt(soilCost())+'</button>')+row('🐦','Helper Bird','Owned '+st.helpers+'/3 · auto-harvests ready crops',st.helpers>=3?'<b>MAX</b>':'<button class="btn" data-a="buyhelp"'+(st.gems<helpCost()?' disabled':'')+'>💎 '+fmt(helpCost())+'</button>')}
+if(n==='shop'){T='🛒 Shop';h=row('💎','Buy Gems','1 💎 = $1 in BIRD at the live market rate.<br><span id="gp">'+(GP||'Loading price…')+'</span>','<button class="btn" data-a="invest">Open</button>')+row('💱','Trade Token','Buy or sell the token on floor.supwars.fun. Trading involves risk.','<button class="btn" data-a="trade">Open</button>')+row('🟫','New Plot','Plots open: '+st.open+'/16',st.open>=16?'<b>MAX</b>':'<button class="btn" data-a="buyplot"'+(st.gems<plotCost()?' disabled':'')+'>💎 '+fmt(plotCost())+'</button>')+row('✨','Super Soil','Level '+st.soil+'/5 · crops grow 10% faster per level',st.soil>=5?'<b>MAX</b>':'<button class="btn" data-a="buysoil"'+(st.gems<soilCost()?' disabled':'')+'>💎 '+fmt(soilCost())+'</button>')+row('🐦','Helper Bird','Owned '+st.helpers+'/3 · auto-harvests ready crops',st.helpers>=3?'<b>MAX</b>':'<button class="btn" data-a="buyhelp"'+(st.gems<helpCost()?' disabled':'')+'>💎 '+fmt(helpCost())+'</button>')}
 if(n==='barn'){T='🏚️ Barn';const tot=R4(st.crops.reduce((a,c,i)=>a+c*SEEDS[i].s,0)*(1-TAX_SELL));h='<button class="btn" data-a="sellall"'+(tot?'':' disabled')+'>Sell everything · 💎 '+fmt(tot)+'</button>'+(TAX_SELL>0?'<p>'+Math.round(TAX_SELL*100)+'% sale tax is already deducted.</p>':'');SEEDS.forEach((s,i)=>{h+=row(s.e,s.n+' × '+st.crops[i],'Sells for 💎 '+fmt(R4(s.s*(1-TAX_SELL)))+(TAX_SELL>0?' each (after tax)':' each'),'<button class="btn" data-a="sell" data-i="'+i+'"'+(st.crops[i]?'':' disabled')+'>Sell</button>')})}
 if(n==='quests'){T='📜 Quests';h='';Q.forEach((q,i)=>{const so=q.k==='soc'?st.soc[q.id]:0,pr=q.k==='lvl'?lvl():q.k==='soc'?(so&&Date.now()-so>=WAIT?1:0):q.k==='wallet'?(st.wallet?1:0):st.stats[q.k],ok=pr>=q.g,cl=st.claimed[i],go=q.k==='soc'&&!so?'<button class="btn" data-a="qgo" data-i="'+i+'">Go</button>':null;h+='<div class="row"><div class="ic">📌</div><div class="tx"><b>'+q.t+'</b><small>'+fmt(Math.min(pr,q.g))+' / '+q.g+' · Reward 💎 '+fmt(q.m)+'</small><div class="pb"><i style="width:'+Math.min(100,pr/q.g*100)+'%"></i></div>'+(q.k==='wallet'?(st.wallet?'<small>'+shortAd(st.wallet)+' <button class="btn red" data-a="disconnect">Disconnect</button></small>':'<small><button class="btn" data-a="wallet">Connect</button></small>'):'')+'</div>'+(cl?'<b>✓</b>':go?go:'<button class="btn" data-a="claim" data-i="'+i+'"'+(ok?'':' disabled')+'>Claim</button>')+'</div>'})}
 if(n==='invest'){T='🏦 Investor';h='<div id="inv">Loading…</div>'}
@@ -234,7 +255,10 @@ else if(a==='harvestall'){let n=0;for(let k=0;k<st.open;k++){const q=st.plots[k]
 else if(a==='snd'){ls('bf_snd',ls('bf_snd')==='0'?'1':'0');sfxPlant();panel('more');return}
 else if(a==='wallet'){connectWallet();return}
 else if(a==='login'){loginFailed=false;login().then(()=>{toast('Signed in');loadInvest()}).catch(e=>toast(e.message||'Sign-in cancelled'));return}
-else if(a==='isell'){const g=parseFloat(($('sellg')||{}).value);if(!(g>0)){toast('Enter how many gems to sell');return}trade('sell',{gems:g}).then(()=>loadInvest('Sell request sent. It is paid to your wallet after review.')).catch(e=>toast(e.message));return}
+else if(a==='sellmax'){const e=$('sellg');if(e){e.value=SELLMAX;updSellEst()}return}
+else if(a==='isell'){if(SELLBUSY)return;const g=parseFloat(($('sellg')||{}).value);if(!(g>0)){toast('Enter how many gems to sell');return}if(g>SELLMAX+1e-9){toast('You only have '+SELLMAX+' 💎 to sell');return}SELLBUSY=true;trade('sell',{gems:g}).then(()=>{SELLBUSY=false;loadInvest('Sell request sent. It is paid to your wallet after review.')}).catch(e=>{SELLBUSY=false;toast(e.message)});return}
+else if(a==='iquote'){const g=parseFloat(($('buyg')||{}).value);if(!(g>0)){toast('Enter how many gems to buy');return}trade('quote',{gems:g}).then(r=>{BQ=r.quote;loadInvest()}).catch(e=>toast(e.message));return}
+else if(a==='ibuy'){const t=(($('txh')||{}).value||'').trim();if(!BQ||!t){toast('Paste the transaction hash');return}trade('buy',{quote_id:BQ.id,tx:t}).then(()=>{BQ=null;loadInvest('Purchase confirmed. Gems added.')}).catch(e=>toast(e.message));return}
 else if(a==='iclaim'){trade('claim').then(()=>loadInvest('Claim request sent. It is paid to your wallet after review.')).catch(e=>toast(e.message));return}
 else if(a==='disconnect'){disconnectWallet();return}
 else if(a==='trade'){window.open(TRADE_URL,'_blank','noopener');return}
@@ -244,11 +268,11 @@ save();head();paint();if(!$('sheet').hidden&&['shop','barn','quests'].includes(c
 document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(t)act(t.dataset.a,t.dataset.i)});
 setInterval(()=>{let n=st.helpers;for(let i=0;i<st.open&&n>0;i++){const p=st.plots[i];if(p&&ready(p)){harvest(i);n--}}if(st.helpers){save();head()}},6000);
 trees();head();seeds();buildGrid();paint();setInterval(paint,500);
-async function updGP(){try{if(!SB)return;const r=await fetch(SUPABASE_URL+'/rest/v1/rpc/gem_price_status',{method:'POST',headers:H,body:'{}'});const d=await r.json();GP=d&&d.ok?'1 💎 = '+Math.round(d.bird_per_gem).toLocaleString()+' BIRD, or '+Math.round(d.bird_per_gem*(1+TAX_BUY)).toLocaleString()+' BIRD with the '+Math.round(TAX_BUY*100)+'% tax. Buying opens soon.':'Gem price is paused right now.';const e=$('gp');if(e)e.textContent=GP}catch(e){}}
+async function updGP(){try{if(!SB)return;const r=await fetch(SUPABASE_URL+'/rest/v1/rpc/gem_price_status',{method:'POST',headers:H,body:'{}'});const d=await r.json();GP=d&&d.ok?'1 💎 = '+Math.round(d.bird_per_gem).toLocaleString()+' BIRD, or '+Math.round(d.bird_per_gem*(1+TAX_BUY)).toLocaleString()+' BIRD with the '+Math.round(TAX_BUY*100)+'% tax.':'Gem price is paused right now.';const e=$('gp');if(e)e.textContent=GP}catch(e){}}
 async function loadEcon(){try{if(!SB)return;const[a,b]=await Promise.all([fetch(SUPABASE_URL+'/rest/v1/seeds_config?select=*&order=sort',{headers:H}).then(r=>r.json()),fetch(SUPABASE_URL+'/rest/v1/economy_config?select=key,value',{headers:H}).then(r=>r.json())]);
 if(Array.isArray(a))a.forEach((d,i)=>{const x=SEEDS[i];if(x){x.c=+d.cost_gems;x.t=+d.grow_secs;x.s=+d.sell_gems;x.l=+d.unlock_lvl}});
 if(Array.isArray(b))b.forEach(d=>{if(d.key==='sell_tax_bps')TAX_SELL=d.value/1e4;if(d.key==='buy_tax_bps')TAX_BUY=d.value/1e4;if(d.key==='settlement_period_days')PAY_DAYS=+d.value;if(d.key==='weekly_budget_bps')BUDGET=d.value/1e4;if(d.key==='wallet_cap_bps')CAP=d.value/1e4});
 seeds();head();paint()}catch(e){}}
-loadEcon();
+loadEcon();restoreWallet();
 if(!st.seen){st.seen=1;save();panel('help')}
 </script></body></html>
