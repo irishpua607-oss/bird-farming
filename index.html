@@ -80,40 +80,355 @@ p{font-size:14px;line-height:1.45;margin:6px 0}
 .harv span{display:block;font-size:26px}
 .harv:active,.nav button:active,.gear:active{transform:translateY(2px)}
 .nav button{font-size:10px;padding-left:2px;padding-right:2px}#inv input{width:96px;padding:6px;border-radius:8px;border:2px solid var(--wood2)}
+/* ===== v2 UI: farm scene like reference ===== */
+.scene{aspect-ratio:100/150;border-radius:22px;box-shadow:0 5px 0 var(--wood2),0 10px 18px rgba(0,0,0,.25)}
+.hud{position:sticky;top:0;z-index:6;padding:6px 2px 8px;margin:0 0 4px;background:linear-gradient(rgba(40,90,20,.8),rgba(40,90,20,0))}
+.toast{position:fixed;left:50%;right:auto;top:78px;transform:translateX(-50%);width:calc(100% - 24px);max-width:440px;z-index:20}
+.side{position:absolute;left:6px;top:8px;display:flex;flex-direction:column;gap:9px;z-index:3}
+.side button{position:relative;width:54px;padding:4px 0 3px;border-radius:14px;border:3px solid #c98b2a;background:linear-gradient(#ffe9a8,#f5c456);color:#4a321a;font-weight:900;font-size:10px;line-height:1.05;box-shadow:0 3px 0 #8a5a33;cursor:pointer}
+.side button:active{transform:translateY(2px)}
+.side button span{display:block;font-size:22px}
+.side i{position:absolute;right:-7px;top:-9px;min-width:18px;height:18px;border-radius:50%;background:#e5322d;color:#fff;font-style:normal;font-size:12px;display:none;place-items:center;border:2px solid #fff}
+.side i.on{display:grid}
+.bar{position:sticky;bottom:0;z-index:6;margin:10px -8px 0;padding:4px 8px calc(8px + env(safe-area-inset-bottom,0px));background:linear-gradient(rgba(40,90,20,0),rgba(40,90,20,.92) 28%)}
+.bar .seeds{margin-top:0}
+.nav button{background:linear-gradient(#ffd56a,#f2a626);border-color:#b86a1c;color:#fff;font-size:12px;padding:6px 0;border-radius:16px;box-shadow:0 4px 0 #8a4a14;text-shadow:0 2px 0 #7a3f10,0 0 3px #7a3f10}
+.nav button span{font-size:26px;text-shadow:none}
+
+/* ---- people ---- */
+.bob{animation:bob .45s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-.35px)}}
+.lg,.arm{transform-box:fill-box;transform-origin:50% 0;animation:leg .45s ease-in-out infinite alternate}
+.arm{animation-name:armsw}
+.l2,.a2{animation-direction:alternate-reverse}
+@keyframes leg{from{transform:rotate(-30deg)}to{transform:rotate(30deg)}}
+@keyframes armsw{from{transform:rotate(-22deg)}to{transform:rotate(22deg)}}
+.stroll{transform-box:fill-box;transform-origin:50% 50%;animation:stroll var(--t,20s) linear infinite}
+@keyframes stroll{
+0%{transform:translateX(0) scaleX(1)}
+49.5%{transform:translateX(var(--dx)) scaleX(1)}
+50%{transform:translateX(var(--dx)) scaleX(-1)}
+99.5%{transform:translateX(0) scaleX(-1)}
+100%{transform:translateX(0) scaleX(1)}}
+
+/* ---- vehicles ---- */
+.drive{animation:driveR var(--t,16s) linear infinite}
+.driveL{animation:driveL var(--t,16s) linear infinite}
+@keyframes driveR{from{transform:translateX(-22px)}to{transform:translateX(var(--w,124px))}}
+@keyframes driveL{from{transform:translateX(var(--w,124px))}to{transform:translateX(-22px)}}
+.bounce{animation:bounce .38s ease-in-out infinite}
+@keyframes bounce{50%{transform:translateY(-.18px)}}
+.wh{transform-box:fill-box;transform-origin:center;animation:spin .45s linear infinite}
+
+/* ---- chickens ---- */
+.wander{transform-box:fill-box;transform-origin:50% 50%;animation:wander var(--t,12s) ease-in-out infinite}
+@keyframes wander{
+0%,10%{transform:translateX(0) scaleX(1)}
+40%,49.9%{transform:translateX(var(--dx)) scaleX(1)}
+50%,60%{transform:translateX(var(--dx)) scaleX(-1)}
+90%,99.9%{transform:translateX(0) scaleX(-1)}
+100%{transform:translateX(0) scaleX(1)}}
+.ckb{animation:ckbob .5s ease-in-out infinite}
+@keyframes ckbob{50%{transform:translateY(-.25px)}}
+.peck{transform-box:fill-box;transform-origin:60% 95%;animation:peck 2.8s ease-in-out infinite}
+@keyframes peck{0%,55%{transform:rotate(0)}62%{transform:rotate(32deg)}68%{transform:rotate(4deg)}75%{transform:rotate(30deg)}82%,100%{transform:rotate(0)}}
+
+/* ---- nature ---- */
+.rip{transform-box:fill-box;transform-origin:center;animation:rip 2.6s ease-out infinite}
+@keyframes rip{from{transform:scale(.2);opacity:.9}to{transform:scale(1.6);opacity:0}}
+.bobber{animation:bobber 1.6s ease-in-out infinite}
+@keyframes bobber{50%{transform:translateY(.4px)}}
+.tail{transform-box:fill-box;transform-origin:100% 50%;animation:tail .3s ease-in-out infinite alternate}
+@keyframes tail{from{transform:rotate(-22deg)}to{transform:rotate(22deg)}}
+.sway{transform-box:fill-box;transform-origin:50% 100%;animation:sway 3s ease-in-out infinite alternate}
+@keyframes sway{from{transform:rotate(-5deg)}to{transform:rotate(5deg)}}
+.puff{transform-box:fill-box;transform-origin:center;animation:puff 3.6s ease-out infinite}
+@keyframes puff{from{transform:translate(0,0) scale(.5);opacity:.85}to{transform:translate(3px,-7px) scale(1.5);opacity:0}}
+.bdw{animation:bdw 8s ease-in-out infinite alternate}
+@keyframes bdw{to{transform:translateX(14px)}}
+
+/* ===== desktop / landscape ===== */
+.scene.desk{aspect-ratio:16/9;border-radius:26px}
+.scene.desk #svgP{visibility:hidden}
+.scene:not(.desk) #svgD{visibility:hidden}
+.scene.desk #svgP *,.scene:not(.desk) #svgD *{animation-play-state:paused!important}
+@media (min-width:900px){
+.app{max-width:max(640px,min(1280px,calc((100vh - 305px)*1.7778 + 16px)))}
+.plot{font-size:clamp(20px,3.4vw,46px)}
+.plot.lock{font-size:clamp(14px,2.2vw,28px)}
+.side{gap:12px;left:12px;top:12px}
+.side button{width:66px;font-size:11px}
+.side button span{font-size:28px}
+.seeds{justify-content:center}
+}
+
+
+/* ===== v3 UI: cozy storybook look (like reference video) ===== */
+:root{--cream:#fffaf0;--ink:#5a3d1e;--wood2:#e7c98f;--ok:#58c23a;--bar:#7fd44a;font-family:'Nunito','Fredoka','Trebuchet MS',ui-rounded,system-ui,sans-serif}
+body{background:linear-gradient(#bfe6ff 0,#d9f2c0 38%,#a8dc72 100%) fixed}
+@media (max-width:899px){.app{max-width:500px}}
+.hud{background:none;position:static;padding:4px 2px 10px;gap:10px}
+.avw{width:46px;height:46px;display:grid;place-items:center}.avw .av{display:none}
+.star{position:static;width:46px;height:46px;font-size:17px;font-weight:900;border:0;border-radius:0;clip-path:polygon(50% 0,62% 34%,98% 36%,69% 58%,80% 94%,50% 73%,20% 94%,31% 58%,2% 36%,38% 34%);background:linear-gradient(#ffe45c,#ffb000);box-shadow:none;color:#7a4a00;padding-top:4px}
+.lv{margin-left:0}.lv b{color:#7a5a2c;text-shadow:none;font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+.xp{height:14px;background:#fff;border:0;border-radius:10px;box-shadow:0 2px 6px rgba(0,0,0,.14)}
+.xp i{background:linear-gradient(#a6ec6a,#58c23a);border-radius:10px}
+.xpt{font-size:9px;color:#5a3d1e;text-shadow:none;place-items:center end;padding-right:6px}
+.pill,.chip{background:#fff;border:0;border-radius:22px;box-shadow:0 3px 10px rgba(0,0,0,.14);padding:3px 4px 3px 12px;color:#5a3d1e}
+.plus{background:#f1ece0;color:#8a6a3a;box-shadow:none}
+.gear{border:0;border-radius:50%;background:linear-gradient(#b99cff,#8c6be0);box-shadow:0 3px 8px rgba(80,40,160,.35);color:#fff}
+.scene{border:0;border-radius:26px;box-shadow:0 10px 28px rgba(40,90,20,.28)}
+.side button{background:#fffaf0;border:0;border-radius:16px;box-shadow:0 3px 10px rgba(0,0,0,.18);color:#6a4a22}
+.plot{border-radius:12px;background:#8d5a31;box-shadow:inset 0 0 0 3px #a97244,0 3px 6px rgba(0,0,0,.25)}
+.plot.rdy{outline:0;box-shadow:0 0 0 3px #ffe066,0 0 16px #ffe066}
+.toast{background:#fff;border:0;border-radius:24px;box-shadow:0 6px 18px rgba(0,0,0,.2);color:#5a3d1e;top:64px;transform:translate(-50%,-8px);transition:opacity .25s,transform .25s}
+.toast.on{transform:translate(-50%,0)}
+.bar{background:none}
+.seeds{background:rgba(255,250,240,.93);border:0;border-radius:20px;box-shadow:0 4px 14px rgba(0,0,0,.15);padding:6px}
+.seed{background:#fff;border:2px solid #f0e4c8;box-shadow:none;border-radius:14px;transition:transform .15s}
+.seed.on{background:#fff3c4;border-color:#ffb400;box-shadow:none;transform:translateY(-3px)}
+.nav{gap:8px}
+.nav button{border:0;border-radius:18px;padding:8px 0 6px;box-shadow:0 4px 10px rgba(0,0,0,.2);background:linear-gradient(#ff9fc0,#f0678f);text-shadow:none;font-size:11px;font-weight:900;display:flex;flex-direction:column;align-items:center;gap:2px}
+.nav button:nth-child(2){background:linear-gradient(#ff8a7a,#d8453a)}
+.nav button:nth-child(3){background:linear-gradient(#7fd8c8,#33a995)}
+.nav button span{font-size:26px}
+.harv{border:0;border-radius:18px;background:linear-gradient(#8be05a,#3fae24);box-shadow:0 4px 10px rgba(0,0,0,.2)}
+.sheet{background:rgba(255,250,235,.35);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);align-items:center;padding:16px}
+.card{position:relative;border:0;border-radius:26px;background:#fffaf0;box-shadow:0 14px 40px rgba(60,40,10,.3);padding:18px 16px;animation:pup .22s ease-out}
+@keyframes pup{from{transform:scale(.9) translateY(14px);opacity:0}}
+.card h2{justify-content:center}
+.card h2>span{background:linear-gradient(#ffb25a,#f08a24);color:#fff;border-radius:16px;padding:6px 20px;font-size:17px;box-shadow:0 3px 0 #b8600f;text-shadow:0 1px 0 rgba(0,0,0,.2)}
+.x{position:absolute;right:10px;top:10px;background:#ff5d8a;box-shadow:0 2px 0 #c43a64}
+.row{border-top:0;background:#fff;border-radius:16px;padding:8px 10px;margin-top:8px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.btn{border:0;border-radius:14px;box-shadow:0 3px 0 #2f7a1c;background:linear-gradient(#7fe04e,#46b02a)}
+.btn:disabled{background:#bbb;box-shadow:0 3px 0 #888}
+.btn.red{background:linear-gradient(#ff7a7a,#e0453f);box-shadow:0 3px 0 #a02020}
+
+/* ===== v3.1 layout: roomy desktop, uncramped phone ===== */
+@media (min-width:900px){
+.hud{padding:10px 2px 12px}
+.star{width:56px;height:56px;font-size:20px}.avw{width:56px;height:56px}
+.lv b{font-size:12px}.xp{height:16px}
+.pill{font-size:17px;padding:4px 5px 4px 14px}.plus{width:28px;height:28px}
+.gear{width:48px;height:48px;font-size:22px}
+.scene{border-radius:30px}
+.side{left:16px;top:16px;gap:12px}
+.side button{width:76px;font-size:12px;border-radius:18px;padding:6px 0 5px}.side button span{font-size:32px}
+.bar{display:flex;gap:14px;align-items:stretch;margin:14px 0 0;padding:0 0 14px}
+.bar .seeds{flex:1;min-width:0;margin:0;padding:8px;justify-content:center}
+.seed{width:96px;font-size:13px;padding:8px 4px}.seed span{font-size:34px}
+.dock{flex:none;width:min(46%,520px);margin:0}
+.nav button{font-size:13px}.nav button span{font-size:32px}
+.harv{font-size:17px}
+}
+@media (max-width:899px){
+.hud{gap:8px;padding:2px 2px 8px}
+.star,.avw{width:42px;height:42px}.star{font-size:15px}
+.side{flex-direction:row;left:8px;right:8px;top:8px;gap:8px}
+.side button{width:58px;font-size:10px;padding:3px 0 2px}.side button span{font-size:22px}
+.bar{margin:8px -8px 0;padding:4px 8px calc(8px + env(safe-area-inset-bottom,0px))}
+.seeds{padding:5px;gap:6px;border-radius:18px}
+.seed{width:68px;font-size:10px;padding:4px 2px}.seed span{font-size:22px}
+.dock{margin-top:6px;gap:6px}
+.nav{gap:6px}.nav button{padding:5px 0 4px;border-radius:16px;font-size:10px}.nav button span{font-size:22px}
+.harv{font-size:13px;border-radius:16px}.harv span{font-size:22px}
+.app{padding-bottom:6px}
+}
+
+/* ===== v3.2 bird logo inside the level star ===== */
+.avw{position:relative}
+.avw .av{display:block;position:absolute;left:50%;top:56%;transform:translate(-50%,-50%);width:74%;height:74%;border:0;border-radius:0;box-shadow:none;background:none;z-index:1}
+.star{font-size:0!important;color:transparent}
+
+/* ===== v3.3 no star, bird logo only ===== */
+.star{display:none!important}
+.avw .av{top:50%;width:118%;height:118%}
+
+/* ===== v3.4 smaller farm plot ===== */
+.plot{font-size:min(5.6vw,26px)}.plot.lock{font-size:min(3.8vw,16px)}
+@media (min-width:900px){.plot{font-size:clamp(16px,2.6vw,36px)}.plot.lock{font-size:clamp(12px,1.8vw,24px)}}
+
+/* ===== v3.5 barn ===== */
+.btn[data-a="sellall"]{display:block;width:100%;padding:12px 10px;font-size:15px;margin-bottom:4px}
+.row .tx small{line-height:1.35}
+
+/* ===== v3.6 phone: fit the whole farm on small screens ===== */
+@media (max-width:899px){
+.scene:not(.desk){aspect-ratio:auto;height:clamp(calc((100vw - 16px)*1.28),calc(100vh - 215px),calc((100vw - 16px)*1.5))}
+@supports (height:100dvh){.scene:not(.desk){height:clamp(calc((100vw - 16px)*1.28),calc(100dvh - 215px),calc((100vw - 16px)*1.5))}}
+}
+@media (max-width:899px) and (max-height:700px){
+.seed{width:62px;padding:3px 2px}.seed span{font-size:20px}
+.nav button,.harv{padding-top:3px;padding-bottom:3px}.nav button span,.harv span{font-size:19px}
+.seeds{padding:4px}.dock{margin-top:4px}
+}
 </style></head><body><div class="app">
 <div class="hud"><div class="pf"><div class="avw"><svg class="av" viewBox="-4 -3.2 8 6.4"><use href="#bird"/></svg><b class="star" id="lvn">1</b></div>
 <div class="lv"><b id="lvl">Farmer Bird · Lv 1</b><div class="xp"><i id="xpb"></i><span class="xpt" id="xpt"></span></div></div></div>
 <div class="chip" id="coins">🪙 0</div>
 <div class="pill"><span id="gems">💎 0</span><button class="plus" data-a="shop">+</button></div><button class="gear" data-a="more">⚙️</button></div>
 <div class="scene" id="scene">
-<svg viewBox="0 0 100 118" preserveAspectRatio="none">
+<svg id="svgP" viewBox="0 0 100 150" preserveAspectRatio="none">
 <defs>
 <g id="tree"><rect x="-0.8" y="3" width="1.6" height="3" fill="#7b4a26"/><circle r="5" fill="#2f8a2f"/><circle cx="-1.5" cy="-1.5" r="3.2" fill="#46a93c"/></g>
 <g id="house"><rect x="-6" y="0" width="12" height="9" fill="#fbf1d8"/><polygon points="-8,0 0,-8 8,0" fill="currentColor"/><rect x="-1.5" y="3.5" width="3" height="5.5" fill="#7b4a26"/><rect x="-5" y="2.5" width="2.5" height="2.5" fill="#7ec8f0"/><rect x="2.5" y="2.5" width="2.5" height="2.5" fill="#7ec8f0"/></g>
 <g id="bird"><image href="data:image/png;base64,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" x="-2.8" y="-2.8" width="5.6" height="5.6"/></g>
 </defs>
-<defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7cc8ff"/><stop offset="1" stop-color="#dff3ff"/></linearGradient><linearGradient id="gr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9bdc4a"/><stop offset="1" stop-color="#6fb82c"/></linearGradient></defs>
-<rect width="100" height="118" fill="url(#gr)"/><rect width="100" height="42" fill="url(#sky)"/>
-<g fill="#fff" class="cl"><ellipse cx="16" cy="12" rx="9" ry="3"/><ellipse cx="22" cy="10.5" rx="6" ry="3"/><ellipse cx="88" cy="14" rx="8" ry="2.8"/></g>
-<path d="M0 42 Q18 30 38 40 T76 36 T100 38 V50 H0Z" fill="#8fd04a"/><path d="M0 46 Q25 38 50 45 T100 43 V54 H0Z" fill="#7cc243"/>
-<path d="M24 44 Q28 49 36 53" stroke="#e0c58f" stroke-width="4" fill="none" stroke-linecap="round"/>
-<g transform="translate(9 21)"><rect x="2" y="9" width="26" height="14" fill="#d9a066" stroke="#a8713f" stroke-width=".6"/><polygon points="-1,10 15,-2 31,10" fill="#4a6fa5" stroke="#2f4a78" stroke-width=".7"/><rect x="22" y="-1" width="3.2" height="6" fill="#a36b45"/><rect x="12.5" y="14" width="5" height="9" rx="2" fill="#4a86c8"/><rect x="5" y="12.5" width="5" height="5" fill="#9fd8ff" stroke="#fff" stroke-width=".6"/><rect x="20" y="12.5" width="5" height="5" fill="#9fd8ff" stroke="#fff" stroke-width=".6"/></g>
-<g transform="translate(68 26)"><polygon points="-5,10 5,10 3,-3 -3,-3" fill="#e9dcc3" stroke="#a5663a" stroke-width=".5"/><polygon points="-4,-3 4,-3 0,-9" fill="#c0392b"/><g class="sail"><rect x="-1" y="-16" width="2" height="22" fill="#f4ecd2"/><rect x="-11" y="-5" width="22" height="2" fill="#f4ecd2"/></g></g>
-<g transform="translate(83 33)"><rect y="6" width="16" height="9" fill="#a8713f"/><rect width="4" height="6" fill="#3f6fb5"/><rect x="4" width="4" height="6" fill="#fff"/><rect x="8" width="4" height="6" fill="#3f6fb5"/><rect x="12" width="4" height="6" fill="#fff"/><circle cx="3" cy="9" r="1.6" fill="#e5322d"/><circle cx="7" cy="9" r="1.6" fill="#ff9f1c"/><circle cx="11" cy="9" r="1.6" fill="#4caf30"/><circle cx="14" cy="9.5" r="1.3" fill="#ffd23f"/></g>
-<rect x="11" y="52" width="78" height="56" rx="3" fill="#c79a5e"/><rect x="12.5" y="53.5" width="75" height="53" rx="2" fill="#a97c4a"/>
-<rect x="11" y="52" width="78" height="56" rx="3" fill="none" stroke="#fff6dc" stroke-width="3" stroke-dasharray="1.3 .9"/>
-<g><circle cx="5" cy="60" r="1.2" fill="#ff7ab8"/><circle cx="94" cy="70" r="1.2" fill="#ffd23f"/><circle cx="6" cy="90" r="1.2" fill="#fff"/><circle cx="93" cy="100" r="1.2" fill="#ff7ab8"/></g>
+<defs>
+<linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5fb8ff"/><stop offset="1" stop-color="#e3f5ff"/></linearGradient>
+<linearGradient id="gr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9bdc4a"/><stop offset="1" stop-color="#5fae2e"/></linearGradient>
+<linearGradient id="rd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6b6e78"/><stop offset="1" stop-color="#53565f"/></linearGradient>
+<linearGradient id="wt" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#46b8f5"/><stop offset="1" stop-color="#1f86d6"/></linearGradient>
+<g id="lamp"><rect x="-.3" y="-8" width=".6" height="8" fill="#2d2d2d"/><circle cy="-8.8" r="2.6" fill="#ffe27a" opacity=".3"/><circle cy="-8.6" r="1" fill="#ffe27a"/></g>
+</defs>
+<rect width="100" height="150" fill="url(#gr)"/>
+<rect width="100" height="46" fill="url(#sky)"/>
+<path d="M0 38 L10 27 L20 35 L34 19 L50 36 L66 24 L82 35 L92 28 L100 34 V46 H0Z" fill="#9bbfdc"/>
+<path d="M0 42 Q16 33 34 40 T70 38 T100 40 V48 H0Z" fill="#7fc84a"/>
+<g fill="#fff" class="cl"><ellipse cx="16" cy="9" rx="9" ry="2.8"/><ellipse cx="22" cy="7.6" rx="6" ry="2.8"/><ellipse cx="70" cy="12" rx="8" ry="2.6"/><ellipse cx="76" cy="10.6" rx="5" ry="2.4"/></g>
+<use href="#tree" transform="translate(3 40) scale(.9)"/><use href="#tree" transform="translate(67 40) scale(.75)"/><use href="#tree" transform="translate(99 41) scale(.9)"/><use href="#tree" transform="translate(46 41) scale(.6)"/>
+
+<!-- silo -->
+<g transform="translate(40 44)"><rect x="-3.4" y="-24" width="6.8" height="24" fill="#c9d2d9"/><path d="M-3.4 -24 A3.4 3.4 0 0 1 3.4 -24Z" fill="#9aa6b0"/><path d="M-3.4 -18 H3.4 M-3.4 -12 H3.4 M-3.4 -6 H3.4" stroke="#aab4bc" stroke-width=".4"/></g>
+<!-- barn -->
+<g transform="translate(22 44)"><rect x="-11" y="-14" width="22" height="14" fill="#cf3a2f"/><polygon points="-11,-14 -7,-22 7,-22 11,-14" fill="#cf3a2f"/><polyline points="-12.5,-13.5 -7.6,-23 7.6,-23 12.5,-13.5" fill="none" stroke="#3c3c46" stroke-width="1.6" stroke-linejoin="round"/><rect x="-4.5" y="-9" width="9" height="9" fill="#b32a22" stroke="#fff6dc" stroke-width=".7"/><path d="M-4.5 -9 L4.5 0 M4.5 -9 L-4.5 0" stroke="#fff6dc" stroke-width=".6"/><rect x="-2.4" y="-20" width="4.8" height="4.4" fill="#fff6dc" stroke="#8a5a33" stroke-width=".4"/><path d="M-2.4 -20 L2.4 -15.6 M2.4 -20 L-2.4 -15.6" stroke="#8a5a33" stroke-width=".4"/><rect x="11.5" y="-3" width="4" height="3" fill="#e6c14a"/><rect x="14.5" y="-2.4" width="3.2" height="2.4" fill="#d9ad32"/></g>
+<!-- house -->
+<g transform="translate(56 44)"><rect x="4.5" y="-22" width="2.6" height="7" fill="#a36b45"/><rect x="-10" y="-11" width="20" height="11" fill="#f6e8c8"/><polygon points="-12.5,-10 0,-22 12.5,-10" fill="#d33a2c"/><polygon points="-12.5,-10 0,-22 0,-20 -10.5,-10" fill="#e2564a"/><circle cx="0" cy="-14" r="1.4" fill="#9fd8ff" stroke="#fff" stroke-width=".4"/><rect x="-1.6" y="-6.5" width="3.2" height="6.5" fill="#7b4a26"/><rect x="-7.5" y="-8" width="3.4" height="3.4" fill="#9fd8ff" stroke="#fff" stroke-width=".5"/><rect x="4.1" y="-8" width="3.4" height="3.4" fill="#9fd8ff" stroke="#fff" stroke-width=".5"/><rect x="-11" y="-1" width="22" height="1" fill="#e9dcc3"/></g>
+<!-- windmill -->
+<g transform="translate(76 44)"><polygon points="-4.2,0 4.2,0 2.6,-17 -2.6,-17" fill="#d9a066" stroke="#a5663a" stroke-width=".4"/><polygon points="-3.2,-17 3.2,-17 0,-21.5" fill="#c0392b"/><rect x="-1" y="-5" width="2" height="5" fill="#7b4a26"/><rect x="-1.2" y="-12" width="2.4" height="2.4" fill="#9fd8ff"/><g transform="translate(0 -18.2)"><g class="sail"><rect x="-.8" y="-11" width="1.6" height="22" fill="#f4ecd2"/><rect x="-11" y="-.8" width="22" height="1.6" fill="#f4ecd2"/><rect x="-3" y="-11" width="3" height="5" fill="#fffaf0" opacity=".85"/><rect x="0" y="6" width="3" height="5" fill="#fffaf0" opacity=".85"/><rect x="6" y="-3" width="5" height="3" fill="#fffaf0" opacity=".85"/><rect x="-11" y="0" width="5" height="3" fill="#fffaf0" opacity=".85"/></g></g></g>
+<!-- greenhouse -->
+<g transform="translate(91 44)"><rect x="-8" y="-9" width="16" height="9" fill="#cfeeff" fill-opacity=".7" stroke="#fff" stroke-width=".6"/><rect x="-7" y="-3" width="14" height="3" fill="#4caf30" opacity=".7"/><polygon points="-8,-9 -5,-13 5,-13 8,-9" fill="#e6f7ff" fill-opacity=".8" stroke="#fff" stroke-width=".6"/><path d="M-4 -9 V0 M0 -13 V0 M4 -9 V0 M-8 -4.5 H8" stroke="#fff" stroke-width=".4"/><circle cx="-5" cy="-2" r=".9" fill="#e5322d"/><circle cx="1" cy="-2" r=".9" fill="#e5322d"/><circle cx="5.5" cy="-2" r=".9" fill="#ff9f1c"/></g>
+
+<!-- farm garden (road removed) -->
+<line x1="0" y1="45.6" x2="100" y2="45.6" stroke="#fff6dc" stroke-width="2.2" stroke-dasharray=".9 1.3"/><line x1="0" y1="45.2" x2="100" y2="45.2" stroke="#d9c9a0" stroke-width=".45"/><line x1="0" y1="46.1" x2="100" y2="46.1" stroke="#d9c9a0" stroke-width=".45"/><rect x="4" y="46.699999999999996" width="92" height="4.2" rx="1" fill="#a8713f"/><rect x="4.7" y="47.4" width="90.6" height="2.8" rx=".6" fill="#6f4824"/><circle cx="6.0" cy="48.6" r="1.25" fill="#7cc944"/><circle cx="6.0" cy="48.5" r=".65" fill="#b8ec7a"/><circle cx="8.7" cy="48.6" r="1.25" fill="#7cc944"/><circle cx="8.7" cy="48.5" r=".65" fill="#b8ec7a"/><circle cx="11.4" cy="48.6" r="1.25" fill="#7cc944"/><circle cx="11.4" cy="48.5" r=".65" fill="#b8ec7a"/><circle cx="14.1" cy="48.6" r="1.25" fill="#7cc944"/><circle cx="14.1" cy="48.5" r=".65" fill="#b8ec7a"/><circle cx="16.8" cy="48.6" r="1.25" fill="#7cc944"/><circle cx="16.8" cy="48.5" r=".65" fill="#b8ec7a"/><circle cx="19.5" cy="48.6" r="1.25" fill="#7cc944"/><circle cx="19.5" cy="48.5" r=".65" fill="#b8ec7a"/><circle cx="22.2" cy="48.6" r="1.25" fill="#7cc944"/><circle cx="22.2" cy="48.5" r=".65" fill="#b8ec7a"/><circle cx="24.9" cy="48.6" r="1.25" fill="#7cc944"/><circle cx="24.9" cy="48.5" r=".65" fill="#b8ec7a"/><circle cx="27.6" cy="48.6" r="1.25" fill="#7cc944"/><circle cx="27.6" cy="48.5" r=".65" fill="#b8ec7a"/><circle cx="30.3" cy="48.6" r="1.25" fill="#7cc944"/><circle cx="30.3" cy="48.5" r=".65" fill="#b8ec7a"/><circle cx="33.0" cy="48.6" r="1.25" fill="#7cc944"/><circle cx="33.0" cy="48.5" r=".65" fill="#b8ec7a"/><rect x="34.3" y="46.699999999999996" width=".7" height="4.2" fill="#8a5a33"/><circle cx="36.7" cy="48.6" r="1.35" fill="#3f9e5a"/><circle cx="36.4" cy="48.3" r=".7" fill="#7fd28f"/><circle cx="39.4" cy="48.6" r="1.35" fill="#3f9e5a"/><circle cx="39.1" cy="48.3" r=".7" fill="#7fd28f"/><circle cx="42.1" cy="48.6" r="1.35" fill="#3f9e5a"/><circle cx="41.8" cy="48.3" r=".7" fill="#7fd28f"/><circle cx="44.8" cy="48.6" r="1.35" fill="#3f9e5a"/><circle cx="44.5" cy="48.3" r=".7" fill="#7fd28f"/><circle cx="47.5" cy="48.6" r="1.35" fill="#3f9e5a"/><circle cx="47.2" cy="48.3" r=".7" fill="#7fd28f"/><circle cx="50.2" cy="48.6" r="1.35" fill="#3f9e5a"/><circle cx="49.9" cy="48.3" r=".7" fill="#7fd28f"/><circle cx="52.9" cy="48.6" r="1.35" fill="#3f9e5a"/><circle cx="52.6" cy="48.3" r=".7" fill="#7fd28f"/><circle cx="55.6" cy="48.6" r="1.35" fill="#3f9e5a"/><circle cx="55.3" cy="48.3" r=".7" fill="#7fd28f"/><circle cx="58.3" cy="48.6" r="1.35" fill="#3f9e5a"/><circle cx="58.0" cy="48.3" r=".7" fill="#7fd28f"/><circle cx="61.0" cy="48.6" r="1.35" fill="#3f9e5a"/><circle cx="60.7" cy="48.3" r=".7" fill="#7fd28f"/><circle cx="63.7" cy="48.6" r="1.35" fill="#3f9e5a"/><circle cx="63.4" cy="48.3" r=".7" fill="#7fd28f"/><rect x="65.0" y="46.699999999999996" width=".7" height="4.2" fill="#8a5a33"/><path d="M67.3 49.8 l-.9 -1.6 M67.3 49.8 v-1.9 M67.3 49.8 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="67.3" cy="50.1" r=".45" fill="#ff9f1c"/><path d="M69.6 49.8 l-.9 -1.6 M69.6 49.8 v-1.9 M69.6 49.8 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="69.6" cy="50.1" r=".45" fill="#ff9f1c"/><path d="M71.9 49.8 l-.9 -1.6 M71.9 49.8 v-1.9 M71.9 49.8 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="71.9" cy="50.1" r=".45" fill="#ff9f1c"/><path d="M74.2 49.8 l-.9 -1.6 M74.2 49.8 v-1.9 M74.2 49.8 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="74.2" cy="50.1" r=".45" fill="#ff9f1c"/><path d="M76.5 49.8 l-.9 -1.6 M76.5 49.8 v-1.9 M76.5 49.8 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="76.5" cy="50.1" r=".45" fill="#ff9f1c"/><path d="M78.8 49.8 l-.9 -1.6 M78.8 49.8 v-1.9 M78.8 49.8 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="78.8" cy="50.1" r=".45" fill="#ff9f1c"/><path d="M81.1 49.8 l-.9 -1.6 M81.1 49.8 v-1.9 M81.1 49.8 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="81.1" cy="50.1" r=".45" fill="#ff9f1c"/><path d="M83.4 49.8 l-.9 -1.6 M83.4 49.8 v-1.9 M83.4 49.8 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="83.4" cy="50.1" r=".45" fill="#ff9f1c"/><path d="M85.7 49.8 l-.9 -1.6 M85.7 49.8 v-1.9 M85.7 49.8 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="85.7" cy="50.1" r=".45" fill="#ff9f1c"/><path d="M88.0 49.8 l-.9 -1.6 M88.0 49.8 v-1.9 M88.0 49.8 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="88.0" cy="50.1" r=".45" fill="#ff9f1c"/><path d="M90.3 49.8 l-.9 -1.6 M90.3 49.8 v-1.9 M90.3 49.8 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="90.3" cy="50.1" r=".45" fill="#ff9f1c"/><path d="M92.6 49.8 l-.9 -1.6 M92.6 49.8 v-1.9 M92.6 49.8 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="92.6" cy="50.1" r=".45" fill="#ff9f1c"/><rect x="4" y="52.1" width="92" height="4.2" rx="1" fill="#a8713f"/><rect x="4.7" y="52.800000000000004" width="90.6" height="2.8" rx=".6" fill="#6f4824"/><path d="M6.0 55.2 l-.9 -1.6 M6.0 55.2 v-1.9 M6.0 55.2 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="6.0" cy="55.5" r=".45" fill="#ff9f1c"/><path d="M8.3 55.2 l-.9 -1.6 M8.3 55.2 v-1.9 M8.3 55.2 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="8.3" cy="55.5" r=".45" fill="#ff9f1c"/><path d="M10.6 55.2 l-.9 -1.6 M10.6 55.2 v-1.9 M10.6 55.2 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="10.6" cy="55.5" r=".45" fill="#ff9f1c"/><path d="M12.9 55.2 l-.9 -1.6 M12.9 55.2 v-1.9 M12.9 55.2 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="12.9" cy="55.5" r=".45" fill="#ff9f1c"/><path d="M15.2 55.2 l-.9 -1.6 M15.2 55.2 v-1.9 M15.2 55.2 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="15.2" cy="55.5" r=".45" fill="#ff9f1c"/><path d="M17.5 55.2 l-.9 -1.6 M17.5 55.2 v-1.9 M17.5 55.2 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="17.5" cy="55.5" r=".45" fill="#ff9f1c"/><path d="M19.8 55.2 l-.9 -1.6 M19.8 55.2 v-1.9 M19.8 55.2 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="19.8" cy="55.5" r=".45" fill="#ff9f1c"/><path d="M22.1 55.2 l-.9 -1.6 M22.1 55.2 v-1.9 M22.1 55.2 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="22.1" cy="55.5" r=".45" fill="#ff9f1c"/><path d="M24.4 55.2 l-.9 -1.6 M24.4 55.2 v-1.9 M24.4 55.2 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="24.4" cy="55.5" r=".45" fill="#ff9f1c"/><path d="M26.7 55.2 l-.9 -1.6 M26.7 55.2 v-1.9 M26.7 55.2 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="26.7" cy="55.5" r=".45" fill="#ff9f1c"/><path d="M29.0 55.2 l-.9 -1.6 M29.0 55.2 v-1.9 M29.0 55.2 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="29.0" cy="55.5" r=".45" fill="#ff9f1c"/><path d="M31.3 55.2 l-.9 -1.6 M31.3 55.2 v-1.9 M31.3 55.2 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="31.3" cy="55.5" r=".45" fill="#ff9f1c"/><rect x="34.3" y="52.1" width=".7" height="4.2" fill="#8a5a33"/><circle cx="36.7" cy="54.0" r="1.25" fill="#7cc944"/><circle cx="36.7" cy="53.9" r=".65" fill="#b8ec7a"/><circle cx="39.4" cy="54.0" r="1.25" fill="#7cc944"/><circle cx="39.4" cy="53.9" r=".65" fill="#b8ec7a"/><circle cx="42.1" cy="54.0" r="1.25" fill="#7cc944"/><circle cx="42.1" cy="53.9" r=".65" fill="#b8ec7a"/><circle cx="44.8" cy="54.0" r="1.25" fill="#7cc944"/><circle cx="44.8" cy="53.9" r=".65" fill="#b8ec7a"/><circle cx="47.5" cy="54.0" r="1.25" fill="#7cc944"/><circle cx="47.5" cy="53.9" r=".65" fill="#b8ec7a"/><circle cx="50.2" cy="54.0" r="1.25" fill="#7cc944"/><circle cx="50.2" cy="53.9" r=".65" fill="#b8ec7a"/><circle cx="52.9" cy="54.0" r="1.25" fill="#7cc944"/><circle cx="52.9" cy="53.9" r=".65" fill="#b8ec7a"/><circle cx="55.6" cy="54.0" r="1.25" fill="#7cc944"/><circle cx="55.6" cy="53.9" r=".65" fill="#b8ec7a"/><circle cx="58.3" cy="54.0" r="1.25" fill="#7cc944"/><circle cx="58.3" cy="53.9" r=".65" fill="#b8ec7a"/><circle cx="61.0" cy="54.0" r="1.25" fill="#7cc944"/><circle cx="61.0" cy="53.9" r=".65" fill="#b8ec7a"/><circle cx="63.7" cy="54.0" r="1.25" fill="#7cc944"/><circle cx="63.7" cy="53.9" r=".65" fill="#b8ec7a"/><rect x="65.0" y="52.1" width=".7" height="4.2" fill="#8a5a33"/><circle cx="67.3" cy="54.0" r="1.35" fill="#3f9e5a"/><circle cx="67.0" cy="53.7" r=".7" fill="#7fd28f"/><circle cx="70.0" cy="54.0" r="1.35" fill="#3f9e5a"/><circle cx="69.7" cy="53.7" r=".7" fill="#7fd28f"/><circle cx="72.7" cy="54.0" r="1.35" fill="#3f9e5a"/><circle cx="72.4" cy="53.7" r=".7" fill="#7fd28f"/><circle cx="75.4" cy="54.0" r="1.35" fill="#3f9e5a"/><circle cx="75.1" cy="53.7" r=".7" fill="#7fd28f"/><circle cx="78.1" cy="54.0" r="1.35" fill="#3f9e5a"/><circle cx="77.8" cy="53.7" r=".7" fill="#7fd28f"/><circle cx="80.8" cy="54.0" r="1.35" fill="#3f9e5a"/><circle cx="80.5" cy="53.7" r=".7" fill="#7fd28f"/><circle cx="83.5" cy="54.0" r="1.35" fill="#3f9e5a"/><circle cx="83.2" cy="53.7" r=".7" fill="#7fd28f"/><circle cx="86.2" cy="54.0" r="1.35" fill="#3f9e5a"/><circle cx="85.9" cy="53.7" r=".7" fill="#7fd28f"/><circle cx="88.9" cy="54.0" r="1.35" fill="#3f9e5a"/><circle cx="88.6" cy="53.7" r=".7" fill="#7fd28f"/><circle cx="91.6" cy="54.0" r="1.35" fill="#3f9e5a"/><circle cx="91.3" cy="53.7" r=".7" fill="#7fd28f"/><circle cx="94.3" cy="54.0" r="1.35" fill="#3f9e5a"/><circle cx="94.0" cy="53.7" r=".7" fill="#7fd28f"/><g transform="translate(8 58)"><ellipse cy="1.6" rx="2.9" ry=".7" fill="#000" opacity=".15"/><rect x="-2.6" y="-1.6" width="5.2" height="3.2" rx="1.2" fill="#e6c14a"/><ellipse cx="2.6" cy="0" rx=".9" ry="1.6" fill="#d9ad32"/><path d="M-1 -1.5 V1.5 M1 -1.5 V1.5" stroke="#b8891f" stroke-width=".3"/></g><g transform="translate(14 58.6)"><ellipse cy="1.6" rx="2.9" ry=".7" fill="#000" opacity=".15"/><rect x="-2.6" y="-1.6" width="5.2" height="3.2" rx="1.2" fill="#e6c14a"/><ellipse cx="2.6" cy="0" rx=".9" ry="1.6" fill="#d9ad32"/><path d="M-1 -1.5 V1.5 M1 -1.5 V1.5" stroke="#b8891f" stroke-width=".3"/></g><g transform="translate(90 58.2)"><ellipse cy="1.6" rx="2.9" ry=".7" fill="#000" opacity=".15"/><rect x="-2.6" y="-1.6" width="5.2" height="3.2" rx="1.2" fill="#e6c14a"/><ellipse cx="2.6" cy="0" rx=".9" ry="1.6" fill="#d9ad32"/><path d="M-1 -1.5 V1.5 M1 -1.5 V1.5" stroke="#b8891f" stroke-width=".3"/></g>
+
+<!-- field -->
+<rect x="18" y="61" width="64" height="46" rx="3" fill="#c79a5e"/><rect x="19.5" y="62.5" width="61" height="43" rx="2" fill="#a97c4a"/>
+<rect x="18" y="61" width="64" height="46" rx="3" fill="none" stroke="#fff6dc" stroke-width="2.4" stroke-dasharray="1.3 .9"/>
+<path d="M50 107 Q54 124 51 148" stroke="#e0c58f" stroke-width="6" fill="none" stroke-linecap="round"/>
+
+<!-- sign -->
+<g transform="translate(14 118)"><rect x="-6.5" y="2" width=".9" height="4" fill="#6b4423"/><rect x="5.6" y="2" width=".9" height="4" fill="#6b4423"/><rect x="-8" y="-3.5" width="16" height="7" rx="1" fill="#d9a066" stroke="#8a5a33" stroke-width=".6"/><text x="0" y="-.6" text-anchor="middle" font-size="2.2" font-weight="800" fill="#4a321a" font-family="system-ui,sans-serif">Welcome to</text><text x="0" y="2.4" text-anchor="middle" font-size="3.2" font-weight="900" fill="#4a321a" font-family="system-ui,sans-serif">Bird Farm</text></g>
+
+<!-- pond -->
+<ellipse cx="22" cy="138" rx="19.5" ry="11.5" fill="#b8b2a0"/>
+<ellipse cx="22" cy="138" rx="18" ry="10.2" fill="url(#wt)"/>
+<ellipse cx="22" cy="138" rx="19.5" ry="11.5" fill="none" stroke="#9a9a90" stroke-width=".8" stroke-dasharray="2.4 .8"/>
+<path d="M9 136 Q13 134.4 17 136 M26 142 Q30 140.6 34 142" stroke="#bfe8ff" stroke-width=".5" fill="none" stroke-linecap="round"/>
+<ellipse cx="13" cy="143" rx="2.2" ry="1.2" fill="#3fa23a"/><ellipse cx="31" cy="144.5" rx="2" ry="1.1" fill="#3fa23a"/>
+<g class="stroll" style="--t:14s;--dx:22px;animation-delay:-4s"><g transform="translate(10 141)"><ellipse rx="1.7" ry=".8" fill="#ff7a2a"/><path class="tail" d="M-1.5 0 L-3 -1 L-3 1Z" fill="#ff7a2a"/><circle cx="1" cy="-.2" r=".2" fill="#222"/></g></g>
+<g class="stroll" style="--t:11s;--dx:16px;animation-delay:-2s"><g transform="translate(16 144.5)"><ellipse rx="1.4" ry=".7" fill="#ffc233"/><path class="tail" d="M-1.2 0 L-2.5 -.9 L-2.5 .9Z" fill="#ffc233"/><circle cx=".8" cy="-.2" r=".2" fill="#222"/></g></g>
+<path d="M4 134.5 H26 L27.4 131.5 H5.4Z" fill="#c98b4a" stroke="#8a5a33" stroke-width=".4"/>
+<path d="M9 131.5 L8 134.5 M14 131.5 L13.2 134.5 M19 131.5 L18.4 134.5" stroke="#8a5a33" stroke-width=".3"/>
+<rect x="25" y="134.5" width="1.2" height="3" fill="#6b4423"/><rect x="6" y="134.5" width="1.2" height="2" fill="#6b4423"/>
+<g transform="translate(22 131.6)"><rect x="-1.6" y="-5" width="3.2" height="3.6" rx=".8" fill="#2f6fd0"/><circle cx=".2" cy="-6.4" r="1.35" fill="#f6c9a2"/><ellipse cx=".2" cy="-7.5" rx="2.6" ry=".6" fill="#e8b84a"/><path d="M-1 -7.5 Q.2 -9.3 1.6 -7.5Z" fill="#e8b84a"/><circle cx=".9" cy="-6.5" r=".2" fill="#222"/><rect x="-.8" y="-1.5" width="4.6" height="1.2" rx=".5" fill="#3a5f9e"/><rect x="3" y="-1.5" width="1.2" height="3" rx=".5" fill="#3a5f9e"/><path d="M1 -4 L3.6 -4.6" stroke="#f6c9a2" stroke-width=".8" stroke-linecap="round"/></g>
+<path d="M25.6 127 L34 121.6" stroke="#6b4423" stroke-width=".5"/><path d="M34 121.6 L35.2 137" stroke="#fff" stroke-width=".2"/>
+<g class="bobber"><circle cx="35.2" cy="137" r=".8" fill="#e5322d"/><circle cx="35.2" cy="136.5" r=".35" fill="#fff"/></g>
+<circle class="rip" cx="35.2" cy="137.3" r="2.2" fill="none" stroke="#fff" stroke-width=".3"/>
+<circle class="rip" style="animation-delay:1.3s" cx="35.2" cy="137.3" r="2.2" fill="none" stroke="#fff" stroke-width=".3"/>
+
+<!-- market stall -->
+<g transform="translate(51 146)"><rect x="-5.5" y="-4" width="11" height="4" fill="#a8713f" stroke="#6b4423" stroke-width=".3"/><path d="M-5.5 -5.5 V-4 M5.5 -5.5 V-4" stroke="#6b4423" stroke-width=".5"/><polygon points="-6,-9 -3,-9 -3.5,-5.5 -7,-5.5" fill="#3f6fb5"/><polygon points="-3,-9 0,-9 0,-5.5 -3.5,-5.5" fill="#fff"/><polygon points="0,-9 3,-9 3.5,-5.5 0,-5.5" fill="#3f6fb5"/><polygon points="3,-9 6,-9 7,-5.5 3.5,-5.5" fill="#fff"/><circle cx="-3" cy="-4.6" r=".9" fill="#e5322d"/><circle cx="-.8" cy="-4.6" r=".9" fill="#ff9f1c"/><circle cx="1.4" cy="-4.6" r=".9" fill="#6fd13f"/><circle cx="3.6" cy="-4.6" r=".9" fill="#b48cff"/></g>
+
+<!-- chicken coop + yard -->
+<rect x="60" y="131" width="38" height="18" rx="2" fill="#d4b078" opacity=".85"/>
+<rect x="63" y="121" width="13" height="10" fill="#c98b4a" stroke="#8a5a33" stroke-width=".4"/><polygon points="61.5,122 69.5,114 77.5,122" fill="#4a9e3a" stroke="#2f7a1c" stroke-width=".4"/><rect x="67" y="125" width="5" height="6" rx=".6" fill="#8a5a33"/>
+<rect x="79" y="122" width="14" height="9" fill="#d9a066" stroke="#8a5a33" stroke-width=".4"/><polygon points="77.5,123 86,115.5 94.5,123" fill="#d9362e" stroke="#a02020" stroke-width=".4"/><rect x="82" y="126" width="4.5" height="5" rx=".6" fill="#8a5a33"/><rect x="88" y="125.5" width="3" height="3" fill="#9fd8ff" stroke="#fff" stroke-width=".4"/>
+<rect x="60" y="131" width="38" height="18" rx="2" fill="none" stroke="#a8713f" stroke-width="1"/><rect x="60" y="131" width="38" height="18" rx="2" fill="none" stroke="#fff6dc" stroke-width=".5" stroke-dasharray="1 .8"/>
+<ellipse cx="95" cy="146.5" rx="2.2" ry="1.3" fill="#e6c14a"/><rect x="62" y="145.5" width="5" height="1.6" rx=".5" fill="#8a5a33"/>
+
 <g id="trees"></g>
-<g class="w1"><use href="#bird" x="14" y="49"/></g><g class="w2"><use href="#bird" x="30" y="43"/></g>
-</svg><div class="toast" id="toast"></div></div>
-<div class="seeds" id="seeds"></div>
+<g id="actors"></g>
+<g class="bdw"><use href="#bird" x="42" y="118"/></g>
+
+</svg><svg id="svgD" viewBox="0 0 160 90" preserveAspectRatio="none">
+<defs>
+<linearGradient id="skyD" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5fb8ff"/><stop offset="1" stop-color="#e3f5ff"/></linearGradient>
+<linearGradient id="grD" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9bdc4a"/><stop offset="1" stop-color="#5fae2e"/></linearGradient>
+<linearGradient id="rdD" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6b6e78"/><stop offset="1" stop-color="#53565f"/></linearGradient>
+<linearGradient id="wtD" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#46b8f5"/><stop offset="1" stop-color="#1f86d6"/></linearGradient>
+<g id="lampD"><rect x="-.3" y="-8" width=".6" height="8" fill="#2d2d2d"/><circle cy="-8.8" r="2.6" fill="#ffe27a" opacity=".3"/><circle cy="-8.6" r="1" fill="#ffe27a"/></g>
+</defs>
+<rect width="160" height="90" fill="url(#grD)"/>
+<rect width="160" height="32" fill="url(#skyD)"/>
+<path d="M0 24 L14 14 L28 22 L46 8 L66 22 L88 12 L110 22 L132 10 L150 20 L160 16 V32 H0Z" fill="#9bbfdc"/>
+<path d="M0 28 Q25 21 55 27 T110 25 T160 27 V34 H0Z" fill="#7fc84a"/>
+<g fill="#fff" class="cl"><ellipse cx="26" cy="7" rx="9" ry="2.6"/><ellipse cx="32" cy="5.8" rx="6" ry="2.4"/><ellipse cx="120" cy="9" rx="8" ry="2.4"/><ellipse cx="126" cy="7.8" rx="5" ry="2.2"/><ellipse cx="70" cy="4" rx="6" ry="1.8"/></g>
+<g id="treesD0"></g>
+
+<!-- silo -->
+<g transform="translate(52 32) scale(1.1)"><rect x="-3.4" y="-24" width="6.8" height="24" fill="#c9d2d9"/><path d="M-3.4 -24 A3.4 3.4 0 0 1 3.4 -24Z" fill="#9aa6b0"/><path d="M-3.4 -18 H3.4 M-3.4 -12 H3.4 M-3.4 -6 H3.4" stroke="#aab4bc" stroke-width=".4"/></g>
+<!-- barn -->
+<g transform="translate(30 32) scale(1.2)"><rect x="-11" y="-14" width="22" height="14" fill="#cf3a2f"/><polygon points="-11,-14 -7,-22 7,-22 11,-14" fill="#cf3a2f"/><polyline points="-12.5,-13.5 -7.6,-23 7.6,-23 12.5,-13.5" fill="none" stroke="#3c3c46" stroke-width="1.6" stroke-linejoin="round"/><rect x="-4.5" y="-9" width="9" height="9" fill="#b32a22" stroke="#fff6dc" stroke-width=".7"/><path d="M-4.5 -9 L4.5 0 M4.5 -9 L-4.5 0" stroke="#fff6dc" stroke-width=".6"/><rect x="-2.4" y="-20" width="4.8" height="4.4" fill="#fff6dc" stroke="#8a5a33" stroke-width=".4"/><path d="M-2.4 -20 L2.4 -15.6 M2.4 -20 L-2.4 -15.6" stroke="#8a5a33" stroke-width=".4"/><rect x="11.5" y="-3" width="4" height="3" fill="#e6c14a"/><rect x="14.5" y="-2.4" width="3.2" height="2.4" fill="#d9ad32"/></g>
+<!-- house -->
+<g transform="translate(72 32) scale(1.15)"><rect x="4.5" y="-22" width="2.6" height="7" fill="#a36b45"/><rect x="-10" y="-11" width="20" height="11" fill="#f6e8c8"/><polygon points="-12.5,-10 0,-22 12.5,-10" fill="#d33a2c"/><polygon points="-12.5,-10 0,-22 0,-20 -10.5,-10" fill="#e2564a"/><circle cx="0" cy="-14" r="1.4" fill="#9fd8ff" stroke="#fff" stroke-width=".4"/><rect x="-1.6" y="-6.5" width="3.2" height="6.5" fill="#7b4a26"/><rect x="-7.5" y="-8" width="3.4" height="3.4" fill="#9fd8ff" stroke="#fff" stroke-width=".5"/><rect x="4.1" y="-8" width="3.4" height="3.4" fill="#9fd8ff" stroke="#fff" stroke-width=".5"/><rect x="-11" y="-1" width="22" height="1" fill="#e9dcc3"/></g>
+<!-- windmill -->
+<g transform="translate(94 32) scale(.95)"><polygon points="-4.2,0 4.2,0 2.6,-17 -2.6,-17" fill="#d9a066" stroke="#a5663a" stroke-width=".4"/><polygon points="-3.2,-17 3.2,-17 0,-21.5" fill="#c0392b"/><rect x="-1" y="-5" width="2" height="5" fill="#7b4a26"/><rect x="-1.2" y="-12" width="2.4" height="2.4" fill="#9fd8ff"/><g transform="translate(0 -18.2)"><g class="sail"><rect x="-.8" y="-11" width="1.6" height="22" fill="#f4ecd2"/><rect x="-11" y="-.8" width="22" height="1.6" fill="#f4ecd2"/><rect x="-3" y="-11" width="3" height="5" fill="#fffaf0" opacity=".85"/><rect x="0" y="6" width="3" height="5" fill="#fffaf0" opacity=".85"/><rect x="6" y="-3" width="5" height="3" fill="#fffaf0" opacity=".85"/><rect x="-11" y="0" width="5" height="3" fill="#fffaf0" opacity=".85"/></g></g></g>
+<!-- greenhouse -->
+<g transform="translate(152.5 32) scale(.95)"><rect x="-8" y="-9" width="16" height="9" fill="#cfeeff" fill-opacity=".7" stroke="#fff" stroke-width=".6"/><rect x="-7" y="-3" width="14" height="3" fill="#4caf30" opacity=".7"/><polygon points="-8,-9 -5,-13 5,-13 8,-9" fill="#e6f7ff" fill-opacity=".8" stroke="#fff" stroke-width=".6"/><path d="M-4 -9 V0 M0 -13 V0 M4 -9 V0 M-8 -4.5 H8" stroke="#fff" stroke-width=".4"/><circle cx="-5" cy="-2" r=".9" fill="#e5322d"/><circle cx="1" cy="-2" r=".9" fill="#e5322d"/><circle cx="5.5" cy="-2" r=".9" fill="#ff9f1c"/></g>
+
+<!-- crops (corn + tomato) -->
+<g id="cropsD" transform="translate(106 33.6) scale(.62) translate(-104 -10)"></g>
+<!-- scarecrow -->
+<g transform="translate(142 33)"><g class="sway"><rect x="-.4" y="-12" width=".8" height="12" fill="#8a5a33"/><rect x="-5" y="-9" width="10" height=".9" rx=".4" fill="#8a5a33"/><rect x="-1.8" y="-9.6" width="3.6" height="4.2" rx=".6" fill="#3f6fb5"/><circle cy="-11.4" r="1.6" fill="#f6c9a2"/><circle cx=".6" cy="-11.6" r=".25" fill="#222"/><circle cx="-.6" cy="-11.6" r=".25" fill="#222"/><ellipse cy="-12.8" rx="2.6" ry=".6" fill="#d33a2c"/><path d="M-1.4 -12.8 Q0 -15.2 1.4 -12.8Z" fill="#d33a2c"/><path d="M-5 -8.6 l-1.2 1.6 M5 -8.6 l1.2 1.6" stroke="#e6c14a" stroke-width=".5"/></g></g>
+
+<!-- farm garden (road removed) -->
+<line x1="0" y1="33.6" x2="102" y2="33.6" stroke="#fff6dc" stroke-width="2.2" stroke-dasharray=".9 1.3"/><line x1="0" y1="33.2" x2="102" y2="33.2" stroke="#d9c9a0" stroke-width=".45"/><line x1="0" y1="34.1" x2="102" y2="34.1" stroke="#d9c9a0" stroke-width=".45"/><rect x="3" y="34.3" width="95" height="4.2" rx="1" fill="#a8713f"/><rect x="3.7" y="35.0" width="93.6" height="2.8" rx=".6" fill="#6f4824"/><circle cx="5.0" cy="36.2" r="1.25" fill="#7cc944"/><circle cx="5.0" cy="36.1" r=".65" fill="#b8ec7a"/><circle cx="7.7" cy="36.2" r="1.25" fill="#7cc944"/><circle cx="7.7" cy="36.1" r=".65" fill="#b8ec7a"/><circle cx="10.4" cy="36.2" r="1.25" fill="#7cc944"/><circle cx="10.4" cy="36.1" r=".65" fill="#b8ec7a"/><circle cx="13.1" cy="36.2" r="1.25" fill="#7cc944"/><circle cx="13.1" cy="36.1" r=".65" fill="#b8ec7a"/><circle cx="15.8" cy="36.2" r="1.25" fill="#7cc944"/><circle cx="15.8" cy="36.1" r=".65" fill="#b8ec7a"/><circle cx="18.5" cy="36.2" r="1.25" fill="#7cc944"/><circle cx="18.5" cy="36.1" r=".65" fill="#b8ec7a"/><circle cx="21.2" cy="36.2" r="1.25" fill="#7cc944"/><circle cx="21.2" cy="36.1" r=".65" fill="#b8ec7a"/><circle cx="23.9" cy="36.2" r="1.25" fill="#7cc944"/><circle cx="23.9" cy="36.1" r=".65" fill="#b8ec7a"/><circle cx="26.6" cy="36.2" r="1.25" fill="#7cc944"/><circle cx="26.6" cy="36.1" r=".65" fill="#b8ec7a"/><circle cx="29.3" cy="36.2" r="1.25" fill="#7cc944"/><circle cx="29.3" cy="36.1" r=".65" fill="#b8ec7a"/><circle cx="32.0" cy="36.2" r="1.25" fill="#7cc944"/><circle cx="32.0" cy="36.1" r=".65" fill="#b8ec7a"/><rect x="34.3" y="34.3" width=".7" height="4.2" fill="#8a5a33"/><circle cx="36.7" cy="36.2" r="1.35" fill="#3f9e5a"/><circle cx="36.4" cy="35.9" r=".7" fill="#7fd28f"/><circle cx="39.4" cy="36.2" r="1.35" fill="#3f9e5a"/><circle cx="39.1" cy="35.9" r=".7" fill="#7fd28f"/><circle cx="42.1" cy="36.2" r="1.35" fill="#3f9e5a"/><circle cx="41.8" cy="35.9" r=".7" fill="#7fd28f"/><circle cx="44.8" cy="36.2" r="1.35" fill="#3f9e5a"/><circle cx="44.5" cy="35.9" r=".7" fill="#7fd28f"/><circle cx="47.5" cy="36.2" r="1.35" fill="#3f9e5a"/><circle cx="47.2" cy="35.9" r=".7" fill="#7fd28f"/><circle cx="50.2" cy="36.2" r="1.35" fill="#3f9e5a"/><circle cx="49.9" cy="35.9" r=".7" fill="#7fd28f"/><circle cx="52.9" cy="36.2" r="1.35" fill="#3f9e5a"/><circle cx="52.6" cy="35.9" r=".7" fill="#7fd28f"/><circle cx="55.6" cy="36.2" r="1.35" fill="#3f9e5a"/><circle cx="55.3" cy="35.9" r=".7" fill="#7fd28f"/><circle cx="58.3" cy="36.2" r="1.35" fill="#3f9e5a"/><circle cx="58.0" cy="35.9" r=".7" fill="#7fd28f"/><circle cx="61.0" cy="36.2" r="1.35" fill="#3f9e5a"/><circle cx="60.7" cy="35.9" r=".7" fill="#7fd28f"/><circle cx="63.7" cy="36.2" r="1.35" fill="#3f9e5a"/><circle cx="63.4" cy="35.9" r=".7" fill="#7fd28f"/><rect x="66.0" y="34.3" width=".7" height="4.2" fill="#8a5a33"/><path d="M68.3 37.4 l-.9 -1.6 M68.3 37.4 v-1.9 M68.3 37.4 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="68.3" cy="37.7" r=".45" fill="#ff9f1c"/><path d="M70.6 37.4 l-.9 -1.6 M70.6 37.4 v-1.9 M70.6 37.4 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="70.6" cy="37.7" r=".45" fill="#ff9f1c"/><path d="M72.9 37.4 l-.9 -1.6 M72.9 37.4 v-1.9 M72.9 37.4 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="72.9" cy="37.7" r=".45" fill="#ff9f1c"/><path d="M75.2 37.4 l-.9 -1.6 M75.2 37.4 v-1.9 M75.2 37.4 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="75.2" cy="37.7" r=".45" fill="#ff9f1c"/><path d="M77.5 37.4 l-.9 -1.6 M77.5 37.4 v-1.9 M77.5 37.4 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="77.5" cy="37.7" r=".45" fill="#ff9f1c"/><path d="M79.8 37.4 l-.9 -1.6 M79.8 37.4 v-1.9 M79.8 37.4 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="79.8" cy="37.7" r=".45" fill="#ff9f1c"/><path d="M82.1 37.4 l-.9 -1.6 M82.1 37.4 v-1.9 M82.1 37.4 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="82.1" cy="37.7" r=".45" fill="#ff9f1c"/><path d="M84.4 37.4 l-.9 -1.6 M84.4 37.4 v-1.9 M84.4 37.4 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="84.4" cy="37.7" r=".45" fill="#ff9f1c"/><path d="M86.7 37.4 l-.9 -1.6 M86.7 37.4 v-1.9 M86.7 37.4 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="86.7" cy="37.7" r=".45" fill="#ff9f1c"/><path d="M89.0 37.4 l-.9 -1.6 M89.0 37.4 v-1.9 M89.0 37.4 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="89.0" cy="37.7" r=".45" fill="#ff9f1c"/><path d="M91.3 37.4 l-.9 -1.6 M91.3 37.4 v-1.9 M91.3 37.4 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="91.3" cy="37.7" r=".45" fill="#ff9f1c"/><path d="M93.6 37.4 l-.9 -1.6 M93.6 37.4 v-1.9 M93.6 37.4 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="93.6" cy="37.7" r=".45" fill="#ff9f1c"/><path d="M95.9 37.4 l-.9 -1.6 M95.9 37.4 v-1.9 M95.9 37.4 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="95.9" cy="37.7" r=".45" fill="#ff9f1c"/><rect x="3" y="39.699999999999996" width="95" height="4.2" rx="1" fill="#a8713f"/><rect x="3.7" y="40.4" width="93.6" height="2.8" rx=".6" fill="#6f4824"/><path d="M5.0 42.8 l-.9 -1.6 M5.0 42.8 v-1.9 M5.0 42.8 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="5.0" cy="43.1" r=".45" fill="#ff9f1c"/><path d="M7.3 42.8 l-.9 -1.6 M7.3 42.8 v-1.9 M7.3 42.8 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="7.3" cy="43.1" r=".45" fill="#ff9f1c"/><path d="M9.6 42.8 l-.9 -1.6 M9.6 42.8 v-1.9 M9.6 42.8 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="9.6" cy="43.1" r=".45" fill="#ff9f1c"/><path d="M11.9 42.8 l-.9 -1.6 M11.9 42.8 v-1.9 M11.9 42.8 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="11.9" cy="43.1" r=".45" fill="#ff9f1c"/><path d="M14.2 42.8 l-.9 -1.6 M14.2 42.8 v-1.9 M14.2 42.8 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="14.2" cy="43.1" r=".45" fill="#ff9f1c"/><path d="M16.5 42.8 l-.9 -1.6 M16.5 42.8 v-1.9 M16.5 42.8 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="16.5" cy="43.1" r=".45" fill="#ff9f1c"/><path d="M18.8 42.8 l-.9 -1.6 M18.8 42.8 v-1.9 M18.8 42.8 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="18.8" cy="43.1" r=".45" fill="#ff9f1c"/><path d="M21.1 42.8 l-.9 -1.6 M21.1 42.8 v-1.9 M21.1 42.8 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="21.1" cy="43.1" r=".45" fill="#ff9f1c"/><path d="M23.4 42.8 l-.9 -1.6 M23.4 42.8 v-1.9 M23.4 42.8 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="23.4" cy="43.1" r=".45" fill="#ff9f1c"/><path d="M25.7 42.8 l-.9 -1.6 M25.7 42.8 v-1.9 M25.7 42.8 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="25.7" cy="43.1" r=".45" fill="#ff9f1c"/><path d="M28.0 42.8 l-.9 -1.6 M28.0 42.8 v-1.9 M28.0 42.8 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="28.0" cy="43.1" r=".45" fill="#ff9f1c"/><path d="M30.3 42.8 l-.9 -1.6 M30.3 42.8 v-1.9 M30.3 42.8 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="30.3" cy="43.1" r=".45" fill="#ff9f1c"/><path d="M32.6 42.8 l-.9 -1.6 M32.6 42.8 v-1.9 M32.6 42.8 l.9 -1.6" stroke="#3f9e2a" stroke-width=".55" stroke-linecap="round" fill="none"/><circle cx="32.6" cy="43.1" r=".45" fill="#ff9f1c"/><rect x="34.3" y="39.699999999999996" width=".7" height="4.2" fill="#8a5a33"/><circle cx="36.7" cy="41.6" r="1.25" fill="#7cc944"/><circle cx="36.7" cy="41.5" r=".65" fill="#b8ec7a"/><circle cx="39.4" cy="41.6" r="1.25" fill="#7cc944"/><circle cx="39.4" cy="41.5" r=".65" fill="#b8ec7a"/><circle cx="42.1" cy="41.6" r="1.25" fill="#7cc944"/><circle cx="42.1" cy="41.5" r=".65" fill="#b8ec7a"/><circle cx="44.8" cy="41.6" r="1.25" fill="#7cc944"/><circle cx="44.8" cy="41.5" r=".65" fill="#b8ec7a"/><circle cx="47.5" cy="41.6" r="1.25" fill="#7cc944"/><circle cx="47.5" cy="41.5" r=".65" fill="#b8ec7a"/><circle cx="50.2" cy="41.6" r="1.25" fill="#7cc944"/><circle cx="50.2" cy="41.5" r=".65" fill="#b8ec7a"/><circle cx="52.9" cy="41.6" r="1.25" fill="#7cc944"/><circle cx="52.9" cy="41.5" r=".65" fill="#b8ec7a"/><circle cx="55.6" cy="41.6" r="1.25" fill="#7cc944"/><circle cx="55.6" cy="41.5" r=".65" fill="#b8ec7a"/><circle cx="58.3" cy="41.6" r="1.25" fill="#7cc944"/><circle cx="58.3" cy="41.5" r=".65" fill="#b8ec7a"/><circle cx="61.0" cy="41.6" r="1.25" fill="#7cc944"/><circle cx="61.0" cy="41.5" r=".65" fill="#b8ec7a"/><circle cx="63.7" cy="41.6" r="1.25" fill="#7cc944"/><circle cx="63.7" cy="41.5" r=".65" fill="#b8ec7a"/><rect x="66.0" y="39.699999999999996" width=".7" height="4.2" fill="#8a5a33"/><circle cx="68.3" cy="41.6" r="1.35" fill="#3f9e5a"/><circle cx="68.0" cy="41.3" r=".7" fill="#7fd28f"/><circle cx="71.0" cy="41.6" r="1.35" fill="#3f9e5a"/><circle cx="70.7" cy="41.3" r=".7" fill="#7fd28f"/><circle cx="73.7" cy="41.6" r="1.35" fill="#3f9e5a"/><circle cx="73.4" cy="41.3" r=".7" fill="#7fd28f"/><circle cx="76.4" cy="41.6" r="1.35" fill="#3f9e5a"/><circle cx="76.1" cy="41.3" r=".7" fill="#7fd28f"/><circle cx="79.1" cy="41.6" r="1.35" fill="#3f9e5a"/><circle cx="78.8" cy="41.3" r=".7" fill="#7fd28f"/><circle cx="81.8" cy="41.6" r="1.35" fill="#3f9e5a"/><circle cx="81.5" cy="41.3" r=".7" fill="#7fd28f"/><circle cx="84.5" cy="41.6" r="1.35" fill="#3f9e5a"/><circle cx="84.2" cy="41.3" r=".7" fill="#7fd28f"/><circle cx="87.2" cy="41.6" r="1.35" fill="#3f9e5a"/><circle cx="86.9" cy="41.3" r=".7" fill="#7fd28f"/><circle cx="89.9" cy="41.6" r="1.35" fill="#3f9e5a"/><circle cx="89.6" cy="41.3" r=".7" fill="#7fd28f"/><circle cx="92.6" cy="41.6" r="1.35" fill="#3f9e5a"/><circle cx="92.3" cy="41.3" r=".7" fill="#7fd28f"/><circle cx="95.3" cy="41.6" r="1.35" fill="#3f9e5a"/><circle cx="95.0" cy="41.3" r=".7" fill="#7fd28f"/><g transform="translate(8 46)"><ellipse cy="1.6" rx="2.9" ry=".7" fill="#000" opacity=".15"/><rect x="-2.6" y="-1.6" width="5.2" height="3.2" rx="1.2" fill="#e6c14a"/><ellipse cx="2.6" cy="0" rx=".9" ry="1.6" fill="#d9ad32"/><path d="M-1 -1.5 V1.5 M1 -1.5 V1.5" stroke="#b8891f" stroke-width=".3"/></g><g transform="translate(14 46.6)"><ellipse cy="1.6" rx="2.9" ry=".7" fill="#000" opacity=".15"/><rect x="-2.6" y="-1.6" width="5.2" height="3.2" rx="1.2" fill="#e6c14a"/><ellipse cx="2.6" cy="0" rx=".9" ry="1.6" fill="#d9ad32"/><path d="M-1 -1.5 V1.5 M1 -1.5 V1.5" stroke="#b8891f" stroke-width=".3"/></g>
+
+<!-- paths -->
+<path d="M64 47 Q60 66 66 90" stroke="#e0c58f" stroke-width="4" fill="none" stroke-linecap="round"/>
+<!-- field -->
+<rect x="72" y="49" width="52" height="36" rx="3" fill="#c79a5e"/><rect x="73.5" y="50.5" width="49" height="33" rx="2" fill="#a97c4a"/>
+<rect x="72" y="49" width="52" height="36" rx="3" fill="none" stroke="#fff6dc" stroke-width="1.8" stroke-dasharray="1.3 .9"/>
+
+<!-- pond -->
+<ellipse cx="40" cy="65" rx="21" ry="13.5" fill="#b8b2a0"/>
+<ellipse cx="40" cy="65" rx="19.5" ry="12" fill="url(#wtD)"/>
+<ellipse cx="40" cy="65" rx="21" ry="13.5" fill="none" stroke="#9a9a90" stroke-width=".8" stroke-dasharray="2.4 .8"/>
+<path d="M26 63 Q31 61.2 36 63 M44 71 Q49 69.4 54 71" stroke="#bfe8ff" stroke-width=".5" fill="none" stroke-linecap="round"/>
+<ellipse cx="28" cy="72" rx="2.4" ry="1.3" fill="#3fa23a"/><ellipse cx="52" cy="60" rx="2.2" ry="1.2" fill="#3fa23a"/><circle cx="52.4" cy="59.7" r=".8" fill="#ff7ab8"/>
+<g class="stroll" style="--t:16s;--dx:26px;animation-delay:-4s"><g transform="translate(24 70)"><ellipse rx="1.7" ry=".8" fill="#ff7a2a"/><path class="tail" d="M-1.5 0 L-3 -1 L-3 1Z" fill="#ff7a2a"/><circle cx="1" cy="-.2" r=".2" fill="#222"/></g></g>
+<g class="stroll" style="--t:12s;--dx:18px;animation-delay:-2s"><g transform="translate(30 73.5)"><ellipse rx="1.4" ry=".7" fill="#ffc233"/><path class="tail" d="M-1.2 0 L-2.5 -.9 L-2.5 .9Z" fill="#ffc233"/><circle cx=".8" cy="-.2" r=".2" fill="#222"/></g></g>
+<path d="M15 66.5 H38 L39.4 63.5 H16.4Z" fill="#c98b4a" stroke="#8a5a33" stroke-width=".4"/>
+<path d="M21 63.5 L20 66.5 M27 63.5 L26.2 66.5 M33 63.5 L32.4 66.5" stroke="#8a5a33" stroke-width=".3"/>
+<rect x="36.5" y="66.5" width="1.2" height="3" fill="#6b4423"/><rect x="17" y="66.5" width="1.2" height="2" fill="#6b4423"/>
+<g transform="translate(34 63.8) scale(1.1)"><rect x="-1.6" y="-5" width="3.2" height="3.6" rx=".8" fill="#2f6fd0"/><circle cx=".2" cy="-6.4" r="1.35" fill="#f6c9a2"/><ellipse cx=".2" cy="-7.5" rx="2.6" ry=".6" fill="#e8b84a"/><path d="M-1 -7.5 Q.2 -9.3 1.6 -7.5Z" fill="#e8b84a"/><circle cx=".9" cy="-6.5" r=".2" fill="#222"/><rect x="-.8" y="-1.5" width="4.6" height="1.2" rx=".5" fill="#3a5f9e"/><rect x="3" y="-1.5" width="1.2" height="3" rx=".5" fill="#3a5f9e"/><path d="M1 -4 L3.6 -4.6" stroke="#f6c9a2" stroke-width=".8" stroke-linecap="round"/></g>
+<path d="M38 58.7 L46 53.5" stroke="#6b4423" stroke-width=".5"/><path d="M46 53.5 L47.4 69" stroke="#fff" stroke-width=".2"/>
+<g class="bobber"><circle cx="47.4" cy="69" r=".8" fill="#e5322d"/><circle cx="47.4" cy="68.5" r=".35" fill="#fff"/></g>
+<circle class="rip" cx="47.4" cy="69.3" r="2.2" fill="none" stroke="#fff" stroke-width=".3"/>
+<circle class="rip" style="animation-delay:1.3s" cx="47.4" cy="69.3" r="2.2" fill="none" stroke="#fff" stroke-width=".3"/>
+
+<!-- bench + girl -->
+<g transform="translate(24 83)"><rect x="-5.5" y="-3.2" width="11" height="1.2" rx=".4" fill="#a8713f"/><rect x="-5.5" y="-6.2" width="11" height="1" rx=".4" fill="#a8713f"/><path d="M-4.6 -2 V0 M4.6 -2 V0 M-4.6 -6 V-3.2 M4.6 -6 V-3.2" stroke="#6b4423" stroke-width=".6"/><rect x="-1.5" y="-7" width="3" height="3.8" rx=".8" fill="#ff7ab8"/><circle cx=".2" cy="-8.2" r="1.35" fill="#f6c9a2"/><ellipse cx=".2" cy="-9.2" rx="2.4" ry=".6" fill="#ff9fcf"/><path d="M-1.2 -9.2 Q.2 -11 1.6 -9.2Z" fill="#ff9fcf"/><circle cx=".9" cy="-8.3" r=".2" fill="#222"/><rect x="-.6" y="-3.4" width="3.8" height="1" rx=".4" fill="#f6c9a2"/><rect x="2.6" y="-3.4" width="1" height="3.2" rx=".4" fill="#f6c9a2"/></g>
+<!-- umbrella table -->
+<g transform="translate(47 85)"><path d="M0 0 V-9" stroke="#8a5a33" stroke-width=".5"/><path d="M-6 -9 Q0 -15 6 -9Z" fill="#e5322d"/><path d="M-2 -9 Q0 -14.6 2 -9Z" fill="#fff"/><ellipse cy="-2" rx="4" ry="1.1" fill="#a8713f"/><path d="M-2 -2 V0 M2 -2 V0" stroke="#6b4423" stroke-width=".5"/></g>
+
+<!-- sign -->
+<g transform="translate(10 83)"><rect x="-6.5" y="2" width=".9" height="4" fill="#6b4423"/><rect x="5.6" y="2" width=".9" height="4" fill="#6b4423"/><rect x="-8" y="-3.5" width="16" height="7" rx="1" fill="#d9a066" stroke="#8a5a33" stroke-width=".6"/><text x="0" y="-.6" text-anchor="middle" font-size="2.2" font-weight="800" fill="#4a321a" font-family="system-ui,sans-serif">Welcome to</text><text x="0" y="2.4" text-anchor="middle" font-size="3.2" font-weight="900" fill="#4a321a" font-family="system-ui,sans-serif">Bird Farm</text></g>
+
+<!-- market stall -->
+<g transform="translate(8 73)"><rect x="-5.5" y="-4" width="11" height="4" fill="#a8713f" stroke="#6b4423" stroke-width=".3"/><path d="M-5.5 -5.5 V-4 M5.5 -5.5 V-4" stroke="#6b4423" stroke-width=".5"/><polygon points="-6,-9 -3,-9 -3.5,-5.5 -7,-5.5" fill="#3f6fb5"/><polygon points="-3,-9 0,-9 0,-5.5 -3.5,-5.5" fill="#fff"/><polygon points="0,-9 3,-9 3.5,-5.5 0,-5.5" fill="#3f6fb5"/><polygon points="3,-9 6,-9 7,-5.5 3.5,-5.5" fill="#fff"/><circle cx="-3" cy="-4.6" r=".9" fill="#e5322d"/><circle cx="-.8" cy="-4.6" r=".9" fill="#ff9f1c"/><circle cx="1.4" cy="-4.6" r=".9" fill="#6fd13f"/><circle cx="3.6" cy="-4.6" r=".9" fill="#b48cff"/></g>
+
+<!-- chicken coop + yard -->
+<rect x="131" y="62" width="28" height="24" rx="2" fill="#d4b078" opacity=".85"/>
+<rect x="133" y="54" width="11" height="8" fill="#c98b4a" stroke="#8a5a33" stroke-width=".4"/><polygon points="131.5,55 138.5,47.5 145.5,55" fill="#4a9e3a" stroke="#2f7a1c" stroke-width=".4"/><rect x="136.5" y="57.5" width="4" height="4.5" rx=".6" fill="#8a5a33"/>
+<rect x="146" y="55" width="12" height="7" fill="#d9a066" stroke="#8a5a33" stroke-width=".4"/><polygon points="144.5,56 152,49 159.5,56" fill="#d9362e" stroke="#a02020" stroke-width=".4"/><rect x="148.5" y="58" width="3.6" height="4" rx=".5" fill="#8a5a33"/><rect x="153.5" y="57.5" width="2.6" height="2.6" fill="#9fd8ff" stroke="#fff" stroke-width=".4"/>
+<rect x="131" y="62" width="28" height="24" rx="2" fill="none" stroke="#a8713f" stroke-width="1"/><rect x="131" y="62" width="28" height="24" rx="2" fill="none" stroke="#fff6dc" stroke-width=".5" stroke-dasharray="1 .8"/>
+<ellipse cx="155" cy="83.5" rx="2.2" ry="1.3" fill="#e6c14a"/><rect x="133" y="83" width="5" height="1.6" rx=".5" fill="#8a5a33"/>
+
+<g id="treesD"></g>
+<g id="actorsD"></g>
+<g class="bdw"><use href="#bird" x="30" y="86"/></g>
+</svg>
+<div class="side"><button data-a="quests"><span>📜</span>Daily Quest<i id="qbadge">!</i></button><button data-a="lb"><span>🏆</span>Top</button><button data-a="invest"><span>🪺</span>Nest</button></div><div class="toast" id="toast"></div></div>
+<div class="bar"><div class="seeds" id="seeds"></div>
 <div class="dock"><div class="nav">
-<button data-a="shop"><span>🛒</span>Shop</button><button data-a="barn"><span>🏚️</span>Barn</button><button data-a="quests"><span>📜</span>Quests</button><button data-a="lb"><span>🏆</span>Top</button><button data-a="invest"><span>🏦</span>Invest</button></div>
-<button class="harv" data-a="harvestall"><span>🧺</span>Harvest All</button></div>
+<button data-a="shop"><span>🛒</span>Shop</button><button data-a="barn"><span>🏚️</span>Barn</button><button data-a="more"><span>⚙️</span>Settings</button></div>
+<button class="harv" data-a="harvestall"><span>🧺</span>Harvest All</button></div></div>
 </div>
 <div class="sheet" id="sheet" hidden><div class="card"><h2><span id="st"></span><button class="x" data-a="farm">✕</button></h2><div id="sb"></div></div></div>
 <script>
-const SEEDS=[{n:'Wheat',e:'🌾',c:0.1,t:1800,s:0.1,l:1,x:4},{n:'Carrot',e:'🥕',c:0.25,t:3600,s:0.25,l:1,x:9},{n:'Corn',e:'🌽',c:0.5,t:7200,s:0.5,l:2,x:24},{n:'Pumpkin',e:'🎃',c:1,t:14400,s:1,l:3,x:70},{n:'Strawberry',e:'🍓',c:2,t:28800,s:2,l:4,x:140}];
+const SEEDS=[{n:'Wheat',e:'🌾',c:0.1,t:1800,s:0.13,l:1,x:4},{n:'Carrot',e:'🥕',c:0.25,t:3600,s:0.325,l:1,x:9},{n:'Corn',e:'🌽',c:0.5,t:7200,s:0.65,l:2,x:24},{n:'Pumpkin',e:'🎃',c:1,t:14400,s:1.3,l:3,x:70},{n:'Strawberry',e:'🍓',c:2,t:28800,s:2.6,l:4,x:140}];
 const Q=[{t:'Harvest 10 crops',k:'harv',g:10,c:50,m:1},{t:'Plant 15 seeds',k:'plant',g:15,c:60,m:1},{t:'Sell 0.5 💎 worth of crops',k:'earn',g:0.5,c:0,m:2},{t:'Reach level 4',k:'lvl',g:4,c:150,m:3},
 {t:'Follow @suprabird_ on X',k:'soc',id:'follow',url:'https://x.com/suprabird_',g:1,c:100,m:2},
 {t:'Retweet the pinned post on X',k:'soc',id:'rt',url:'https://x.com/suprabird_/status/2116444049288614143',g:1,c:100,m:2},
@@ -154,7 +469,7 @@ let SESS=null;try{SESS=JSON.parse(ls('bf_sess')||'null')}catch(e){}
 const nz=a=>(a||'').toLowerCase().replace(/^0x/,'').replace(/^0+/,''),eh=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])),nb=n=>Math.round(+n||0).toLocaleString('en-US');
 async function fn(u,b){const r=await fetch(u,{method:'POST',headers:H,body:JSON.stringify(b)});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'Request failed');return j}
 async function login(){const p=await waitProvider();if(!p)throw new Error('StarKey wallet not detected in this browser. Open the game from the StarKey app browser or a browser with the StarKey extension.');if(!st.wallet)throw new Error('Connect your wallet first');await ensureConnected(p);
-const n=await fn(AU,{action:'nonce',address:st.wallet});const r=await p.signMessage({message:n.message,nonce:n.nonce});
+const n=await fn(AU,{action:'nonce',address:st.wallet});const hx='0x'+Array.from(new TextEncoder().encode(n.message),b=>b.toString(16).padStart(2,'0')).join('');const sm=m=>p.signMessage({message:m==='hex'?hx:n.message,nonce:n.nonce});let mode=ls('bf_sm')||(/iPhone|iPad|Android/i.test(navigator.userAgent)?'hex':'plain'),r;try{r=await sm(mode)}catch(e){if(!/BytesLike|bytes|invalid/i.test(String((e&&e.message)||e)))throw e;mode=mode==='hex'?'plain':'hex';r=await sm(mode)}ls('bf_sm',mode);
 let inner=r&&r.result&&typeof r.result==='object'?r.result:(r||{});
 if(inner.publicKey==null){try{let a=await p.account();a=Array.isArray(a)?a[0]:a;if(a&&a.publicKey)inner={...inner,publicKey:a.publicKey}}catch(e){}}
 const v=await fn(AU,{action:'verify',nonce:n.nonce,response:inner});SESS={token:v.token,address:v.address};ls('bf_sess',JSON.stringify(SESS))}
@@ -166,54 +481,14 @@ async function refreshBird(){if(!st.wallet)return;const b=await birdBal(st.walle
 const birdLine=()=>BB===null||BBat!==st.wallet?'':'<p><small>BIRD in your wallet: <b>'+nb(BB)+'</b></small></p>';
 let BQ=null,SELLP=0,SELLFEE=0,SELLMAX=0,SELLBUSY=false;
 function updSellEst(){const e=$('sellest'),i=$('sellg');if(!e||!i)return;const g=parseFloat(i.value);e.textContent='You get ≈ '+nb(g>0?g*SELLP*(1-SELLFEE):0)+' BIRD'}
-document.addEventListener('input',e=>{if(!e.target)return;if(e.target.id==='sellg')updSellEst();else if(e.target.id==='buyg')updBuyEst()});
-const shortA=a=>String(a).slice(0,8)+'…'+String(a).slice(-6);
-let PAYBUSY=false,BQmanual=false,BQerr='',BUYP=0,BUYTAX=0,BUYMIN=1,BUYMAX=1000,QBUSY=false;
-function updBuyEst(){const e=$('buyest'),i=$('buyg');if(!e||!i)return;const g=parseFloat(i.value),t=g>0?g*BUYP*(1+BUYTAX):0;e.textContent='Total ≈ '+nb(t)+' BIRD (incl. '+(Math.round(BUYTAX*1000)/10)+'% tax)'+(t>0&&BB!==null&&BBat===st.wallet&&t>BB?' (your wallet has '+nb(BB)+')':'')}
+document.addEventListener('input',e=>{if(e.target&&e.target.id==='sellg')updSellEst()});
 function buyRow(s){
 if(!s.can_buy)return row('🛒','Buy gems','Buying is not open for your wallet yet.','<button class="btn" disabled>Soon</button>');
 const tx=(s.buy_tax_bps/100)+'% tax';
-const live=BQ&&(BQ.tx||new Date(BQ.expires_at).getTime()+600000>Date.now());
-if(live&&BQ.tx)return row('🛒','Payment sent','Your payment ('+shortA(BQ.tx)+') is on the chain. We could not confirm it yet. Tap Retry and your gems are added as soon as it is confirmed.<br><span id="paystat">'+eh(BQerr)+'</span>','<button class="btn" data-a="iretry">Retry</button>');
-if(live&&BQmanual)return row('🛒','Pay '+(+BQ.total_bird)+' BIRD','Send exactly this amount of BIRD from your connected wallet to the address below, then paste the transaction hash. Includes '+tx+'.<br><small style="word-break:break-all"><b>'+eh(BQ.treasury)+'</b></small>','<input id="txh" placeholder="0x… tx hash"><br><button class="btn" data-a="ibuy">Verify</button>');
-if(live)return row('🛒','Pay '+(+BQ.total_bird)+' BIRD','For '+BQ.gems+' 💎, incl. '+tx+'. Approve the payment in StarKey.'+(BB!==null&&BBat===st.wallet&&BB<BQ.total_bird?'<br><b>Your wallet has only '+nb(BB)+' BIRD.</b>':'')+'<br><span id="paystat">'+eh(BQerr)+'</span>','<button class="btn" data-a="ipay">Pay with StarKey</button>'+(BQerr?'<br><button class="btn" data-a="imanual">Pay manually</button>':''));
-BUYP=+(s.price&&s.price.bird_per_gem)||0;BUYTAX=(+s.buy_tax_bps||0)/10000;BUYMIN=+s.buy_min_gems||1;BUYMAX=+s.buy_max_gems||1000;
-return row('🛒','Buy gems','Min '+s.buy_min_gems+' · max '+s.buy_max_gems+' 💎<br><span id="buyest">Total ≈ 0 BIRD (incl. '+(Math.round(BUYTAX*1000)/10)+'% tax)</span>','<input id="buyg" type="number" min="'+s.buy_min_gems+'" step="any" placeholder="Gems"><br><button class="btn" data-a="ibuynow">Buy</button>');}
-const pad64=a=>'0x'+String(a).replace(/^0x/i,'').toLowerCase().padStart(64,'0');
-let SDK=null;
-async function loadSdk(){if(!SDK)SDK=await import('https://esm.sh/supra-ts-sdk@1.2.0');return SDK}
-function payStat(t){const e=$('paystat');if(e)e.textContent=t}
-async function confirmBuy(){
-payStat('Confirming on the chain…');let last=null;
-for(let i=0;i<14;i++){try{await trade('buy',{quote_id:BQ.id,tx:BQ.tx});BQ=null;BQerr='';BQmanual=false;PAYBUSY=false;loadInvest('Purchase confirmed. Gems added.');return}catch(e){last=e;if(!/not found yet/i.test(e.message))break;await new Promise(r=>setTimeout(r,3000))}}
-PAYBUSY=false;BQerr=(last&&last.message)||'Could not confirm yet.';loadInvest()}
-async function payQuote(){
-if(PAYBUSY||!BQ)return;PAYBUSY=true;BQerr='';
-try{
-payStat('Opening your wallet…');
-const p=await waitProvider();if(!p)throw new Error('StarKey wallet not detected in this browser.');
-await ensureConnected(p);
-const cur=addrOf(await p.account());
-if(!cur||nz(cur)!==nz(st.wallet))throw new Error('Switch StarKey to your game wallet ('+shortA(st.wallet)+') and try again.');
-let c=null;try{c=await p.getChainId()}catch(e){}
-const id=String((c&&c.chainId)||c||'');if(id&&id!=='8')await p.changeNetwork({chainId:'8'});
-payStat('Preparing the payment…');
-const sdk=await loadSdk();const {SupraClient,Network,HexString,BCS}=sdk;
-const supra=new SupraClient({network:Network.MAINNET});
-const info=await supra.account.getAccountInfo({accountAddress:cur});
-const quants=BigInt(Math.round(+BQ.total_bird*1e6));
-const args=[new HexString(pad64(BIRD_META)).toUint8Array(),new HexString(pad64(BQ.treasury)).toUint8Array(),BCS.bcsSerializeUint64(quants)];
-const mk=ta=>supra.transaction.build.rawTxnObject({senderAddress:cur,senderSequenceNumber:info.sequence_number,function:'0x1::primary_fungible_store::transfer',functionTypeArgs:ta,functionArgs:args,optionalTransactionPayloadArgs:{maxGas:BigInt(5000),txExpiryTime:BigInt(Math.ceil(Date.now()/1000)+180)}});
-let raw;try{raw=mk(['0x1::fungible_asset::Metadata'])}catch(e1){raw=mk([new sdk.TypeTagParser('0x1::fungible_asset::Metadata').parseTypeTag()])}
-payStat('Approve the payment in StarKey…');
-const res=await p.sendTransaction({data:HexString.fromUint8Array(raw.toBytes()).noPrefix(),from:cur,to:'',value:'',chainId:'8'});
-const h=typeof res==='string'?res:(res&&(res.hash||res.txHash||res.transactionHash||res.result));
-if(!h||!/^(0x)?[0-9a-fA-F]{64}$/.test(h))throw new Error('Your wallet did not return a transaction hash.');
-BQ.tx=h.startsWith('0x')?h:'0x'+h;
-await confirmBuy();
-}catch(e){PAYBUSY=false;if(BQ&&BQ.tx)return;const m=(e&&e.message)||String(e);BQerr=/reject|denied|cancel/i.test(m)?'Payment cancelled in your wallet.':m;loadInvest()}}
+if(BQ&&new Date(BQ.expires_at).getTime()>Date.now())return row('🛒','Pay '+(+BQ.total_bird)+' BIRD','Send exactly this amount of BIRD from your connected wallet to the address below, then paste the transaction hash. Quote valid until '+new Date(BQ.expires_at).toLocaleTimeString()+'.'+(BB!==null&&BBat===st.wallet&&BB<BQ.total_bird?' <b>Your wallet has only '+nb(BB)+' BIRD.</b>':'')+'<br><small style="word-break:break-all"><b>'+eh(BQ.treasury)+'</b></small>','<input id="txh" placeholder="0x… tx hash"><br><button class="btn" data-a="ibuy">Verify</button>');
+return row('🛒','Buy gems','Min '+s.buy_min_gems+' · max '+s.buy_max_gems+' 💎. You send BIRD, then paste the transaction hash.','<input id="buyg" type="number" min="'+s.buy_min_gems+'" step="any" placeholder="Gems"><br><button class="btn" data-a="iquote">Get quote</button>');}
 function invHtml(s,msg){let h=msg?'<p><b>'+eh(msg)+'</b></p>':'';const gp=s.price&&+s.price.bird_per_gem?+s.price.bird_per_gem:0;
-if(!s.investor)return h+'<p><b>Investors only.</b> Trading is for wallets that bought 💎 gems with BIRD. Free players farm and keep their gems in the game.</p>'+buyRow(s);
+if(!s.investor)return h+'<p><b>Early Birds only.</b> The Nest is for wallets that bought 💎 gems with BIRD. Free players farm and keep their gems in the game.</p>'+buyRow(s);
 h+=row('💎','Your paid gems','1 💎 ≈ '+(gp?nb(gp)+' BIRD':'…')+' (live price)','<b>'+fmt(s.paid_gems)+'</b>');
 h+=row('🪙','Rewards ready','Up to 0.1% a day on your paid gems. Not guaranteed: it drops when the reward fund runs low. '+(s.claim_tax_bps/100)+'% tax on claims.','<b>'+nb(s.claimable_bird)+' BIRD</b><br><button class="btn" data-a="iclaim"'+(s.can_claim&&s.claimable_bird>0?'':' disabled')+'>Claim</button>');
 SELLP=+s.sell_bird_per_gem||0;SELLFEE=(+s.sell_fee_bps||0)/10000;SELLMAX=+s.paid_gems||0;
@@ -224,7 +499,7 @@ return h+(rec.length?'<p><small>Recent: '+rec.map(eh).join(' | ')+'</small></p>'
 let loginBusy=false,loginFailed=false,loginErr='';
 async function autoLogin(){if(loginBusy)return;loginBusy=true;try{await login();loginFailed=false;loginErr=''}catch(e){loginFailed=true;loginErr=(e&&e.message)||''}loginBusy=false}
 async function loadInvest(msg){const el=$('inv');if(!el)return;
-if(!st.wallet){el.innerHTML='<p>Investors trade 💎 gems for BIRD here. Connect your Supra wallet to start.</p><button class="btn" data-a="wallet">Connect wallet</button>';return}
+if(!st.wallet){el.innerHTML='<p>Trade 💎 gems for BIRD in the Nest. Connect your Supra wallet to start.</p><button class="btn" data-a="wallet">Connect wallet</button>';return}
 if(BBat!==st.wallet||BB===null)await refreshBird();
 const ok=SESS&&nz(SESS.address)===nz(st.wallet);
 if(!ok){
@@ -249,10 +524,81 @@ try{const r=await fetch(SUPABASE_URL+'/rest/v1/scores?select=id,name,xp,lvl,harv
 if(!d.length){el.innerHTML='<p>No one is on the leaderboard yet. Go harvest some crops!</p>';return}
 const medal=['🥇','🥈','🥉'];el.innerHTML=d.map((v,i)=>row(medal[i]||('#'+(i+1)),esc(v.name)+(v.id===pid?' (you)':''),'Lv '+v.lvl+' · '+v.harv+' harvests','<b>'+v.xp+' XP</b>')).join('')}catch(e){if(cur==='lb')el.innerHTML='<p>Could not load the leaderboard. Please try again later.</p>'}}
 let tt;function toast(t){const e=$('toast');e.textContent=t;e.className='toast on';clearTimeout(tt);tt=setTimeout(()=>e.className='toast',2200)}
-function head(){const L=lvl(),lo=20*(L-1)**2,hi=20*L*L;$('coins').style.display='none';$('gems').textContent='💎 '+fmt(st.gems);$('lvl').textContent='Farmer Bird · Lv '+L;$('lvn').textContent=L;$('xpt').textContent=st.xp+' / '+hi;$('xpb').style.width=((st.xp-lo)/(hi-lo)*100)+'%'}
+function head(){badges();const L=lvl(),lo=20*(L-1)**2,hi=20*L*L;$('coins').style.display='none';$('gems').textContent='💎 '+fmt(st.gems);$('lvl').textContent='Farmer Bird · Lv '+L;$('lvn').textContent=L;$('xpt').textContent=st.xp+' / '+hi;$('xpb').style.width=((st.xp-lo)/(hi-lo)*100)+'%'}
 function seeds(){const L=lvl();$('seeds').innerHTML='';SEEDS.forEach((s,i)=>{const b=document.createElement('button');b.className='seed'+(st.sel===i?' on':'')+(L<s.l?' lock':'');b.innerHTML='<span>'+(L<s.l?'🔒':s.e)+'</span>'+s.n+'<br>💎'+fmt(s.c)+(L<s.l?' · Lv'+s.l:'');b.onclick=()=>{if(L<s.l){toast('Reach level '+s.l+' to unlock '+s.n);return}st.sel=i;save();seeds()};$('seeds').appendChild(b)})}
-function trees(){let h='',k=7;const r=()=>(k=(k*9301+49297)%233280)/233280;for(let i=0;i<90;i++){const x=r()*100,y=r()*118;if(x>8&&x<92&&y>5&&y<110)continue;h+='<use href="#tree" x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'"/>'}$('trees').innerHTML=h}
-function buildGrid(){for(let i=0;i<16;i++){const b=document.createElement('button'),c=i%4,r=Math.floor(i/4);b.id='p'+i;b.style.left=(16+c*17.2)+'%';b.style.top=((56+r*12.6)/118*100)+'%';b.onclick=()=>tap(i);$('scene').appendChild(b)}}
+function trees(){let h='',k=11;const r=()=>(k=(k*9301+49297)%233280)/233280;
+const T=(x,y,s)=>'<use href="#tree" transform="translate('+x.toFixed(1)+' '+y.toFixed(1)+') scale('+s.toFixed(2)+')"/>';
+for(let y=66;y<110;y+=7.5){h+=T(2.5+r()*3,y+r()*2,.8+r()*.2);h+=T(97.5-r()*3,y+r()*2,.8+r()*.2)}
+$('trees').innerHTML=h}
+
+
+const SKIN='#f6c9a2';
+const WB='<path d="M1.2 -3.4 L5.2 -3.4 L4.4 -1.4 L2 -1.4Z" fill="#cf3a2f"/><circle cx="3.4" cy="-.9" r=".9" fill="#2b2b2b"/><path d="M.6 -3.2 L1.4 -3.3" stroke="#8a5a33" stroke-width=".5"/><circle cx="2.4" cy="-4" r=".7" fill="#e5322d"/><circle cx="3.6" cy="-4.1" r=".7" fill="#ff9f1c"/><circle cx="4.5" cy="-3.9" r=".6" fill="#6fd13f"/>';
+const BASKET='<rect x="1.2" y="-4.2" width="2.2" height="1.5" rx=".3" fill="#c98b4a"/><circle cx="1.8" cy="-4.5" r=".6" fill="#e5322d"/><circle cx="2.7" cy="-4.5" r=".6" fill="#6fd13f"/>';
+const CRATE='<rect x="1" y="-5" width="3" height="2" fill="#e8b84a" stroke="#a8713f" stroke-width=".2"/><circle cx="2" cy="-5.4" r=".6" fill="#ff9f1c"/><circle cx="3.1" cy="-5.4" r=".6" fill="#e5322d"/>';
+function person(o){const c=o.c||'#e5322d',p=o.p||'#3a5f9e',h=o.h||'#e8b84a';
+return '<g class="stroll" style="--t:'+o.t+'s;--dx:'+o.dx+'px;animation-delay:-'+(o.dl||0)+'s"><g transform="translate('+o.x+' '+o.y+') scale('+(o.s||1)+')"><g class="bob">'
++'<rect class="lg l1" x="-1.2" y="-2.4" width="1.1" height="2.4" rx=".4" fill="'+p+'"/><rect class="lg l2" x=".1" y="-2.4" width="1.1" height="2.4" rx=".4" fill="'+p+'"/>'
++(o.g?'<path d="M-2 -1.8 L2 -1.8 L1.3 -5.2 L-1.3 -5.2Z" fill="'+c+'"/>':'<rect x="-1.5" y="-5.3" width="3" height="3.4" rx=".8" fill="'+c+'"/>')
++(o.prop?'<rect x=".4" y="-4.8" width="2.6" height=".9" rx=".4" fill="'+SKIN+'"/>':'<rect class="arm a1" x="-.5" y="-5" width="1" height="2.6" rx=".5" fill="'+SKIN+'"/>')
++'<circle cx=".2" cy="-6.5" r="1.35" fill="'+SKIN+'"/><ellipse cx=".2" cy="-7.6" rx="2.5" ry=".6" fill="'+h+'"/><path d="M-1.2 -7.6 Q.2 -9.4 1.6 -7.6Z" fill="'+h+'"/><circle cx=".9" cy="-6.6" r=".2" fill="#222"/>'
++(o.prop==='basket'?BASKET:o.prop==='wb'?WB:o.prop==='crate'?CRATE:'')+'</g></g></g>'}
+
+const wheel=(x,r)=>'<g transform="translate('+x+' '+(-r)+')"><circle r="'+r+'" fill="#262626"/><g class="wh"><circle r="'+(r*.55)+'" fill="#d9d9d9"/><rect x="'+(-r*.12)+'" y="'+(-r*.55)+'" width="'+(r*.24)+'" height="'+(r*1.1)+'" fill="#8a8a8a"/></g></g>';
+const pickup=(col,dk,cargo)=>'<g class="bounce"><rect x="-7.5" y="-3.9" width="15" height="2.7" rx=".7" fill="'+col+'"/><rect x="-7.5" y="-4.7" width="7" height=".9" fill="'+dk+'"/><path d="M0 -3.9 L1.3 -6.5 H4.8 L6.2 -3.9Z" fill="'+col+'"/><path d="M1.7 -4 L2.5 -5.9 H4.4 L5.2 -4Z" fill="#c4e8ff"/>'+cargo+'<rect x="6.8" y="-3.2" width=".9" height=".9" fill="#fff2a0"/><rect x="-7.6" y="-3.2" width=".5" height=".9" fill="#ff4d4d"/>'+wheel(-4.6,1.4)+wheel(4.2,1.4)+'</g>';
+const sedan=col=>'<g class="bounce"><rect x="-7" y="-3.3" width="14" height="2.5" rx=".9" fill="'+col+'"/><path d="M-3.8 -3.3 L-2.5 -5.9 H2.7 L4.5 -3.3Z" fill="'+col+'"/><path d="M-2.9 -3.4 L-2 -5.4 H-.2 V-3.4Z M.3 -3.4 V-5.4 H2.3 L3.4 -3.4Z" fill="#c4e8ff"/><rect x="6.2" y="-3" width=".8" height=".9" fill="#fff2a0"/><rect x="-7.1" y="-3" width=".5" height=".9" fill="#ff4d4d"/>'+wheel(-4.2,1.3)+wheel(4.2,1.3)+'</g>';
+const CARGO='<rect x="-6.6" y="-5.8" width="2.8" height="1.3" fill="#e8b84a"/><rect x="-3.5" y="-5.6" width="2.4" height="1.1" fill="#6fd13f"/>';
+const lane=(y,cls,t,dl,flip,html,w)=>'<g transform="translate(0 '+y+')"><g class="'+cls+'" style="--t:'+t+'s;--w:'+(w||124)+'px;animation-delay:-'+dl+'s">'+(flip?'<g transform="scale(-1 1)">'+html+'</g>':html)+'</g></g>';
+function chicken(x,y,dx,t,dl){return '<g class="wander" style="--t:'+t+'s;--dx:'+dx+'px;animation-delay:-'+dl+'s"><g transform="translate('+x+' '+y+')">'
++'<path d="M-.3 -1 V0 M.7 -1 V0" stroke="#f29a2e" stroke-width=".35" fill="none"/>'
++'<g class="ckb"><g class="peck"><ellipse cx="0" cy="-2.1" rx="1.9" ry="1.4" fill="#fff"/><path d="M-1.6 -2.6 L-2.9 -4.1 L-1.1 -3.7Z" fill="#eee"/><ellipse cx="-.3" cy="-2" rx="1" ry=".7" fill="#ddd"/><circle cx="1.7" cy="-3.7" r=".95" fill="#fff"/><path d="M1.2 -4.5 Q1.7 -5.5 2.2 -4.5Z" fill="#e5322d"/><path d="M2.5 -3.8 L3.5 -3.5 L2.5 -3.3Z" fill="#f29a2e"/><circle cx="2" cy="-3.8" r=".2" fill="#222"/></g></g></g></g>'}
+const sun=(x,y,d)=>'<g transform="translate('+x+' '+y+')"><g class="sway" style="animation-delay:-'+d+'s"><path d="M0 0 V-4" stroke="#3f9e22" stroke-width=".5"/><ellipse cx="-1" cy="-1.8" rx="1" ry=".4" fill="#4caf30"/><circle cy="-5" r="1.5" fill="#ffd23f"/><circle cy="-5" r=".7" fill="#7a4a1c"/></g></g>';
+const skybird=(y,t,dl,w)=>'<g transform="translate(0 '+y+')"><g class="drive" style="--t:'+t+'s;--w:'+(w||124)+'px;animation-delay:-'+dl+'s"><path d="M0 0 Q1 -1.2 2 0 Q3 -1.2 4 0" stroke="#3a3a44" stroke-width=".5" fill="none" stroke-linecap="round"/></g></g>';
+function actors(){let h='';
+h+=skybird(14,38,10)+skybird(19,52,30);
+for(let i=0;i<3;i++)h+='<g class="puff" style="animation-delay:-'+(i*1.2)+'s"><circle cx="60.6" cy="22" r="1.1" fill="#fff"/></g>';
+// top sidewalk walker
+h+=person({x:6,y:57,dx:60,t:26,dl:3,c:'#e5322d',prop:'wb'});
+// vehicles
+// bottom sidewalk walker
+// farm kid in the yard
+h+=person({x:63,y:148.6,dx:26,t:22,dl:5,c:'#3fa23a',prop:'crate'});
+// chickens
+h+=chicken(66,137,12,11,0)+chicken(75,141,16,14,4)+chicken(84,136,10,9,2)+chicken(70,146,18,16,7)+chicken(90,143,6,12,5);
+h+=sun(42,149.5,0)+sun(44.8,149,1)+sun(57.5,149.5,.6)+sun(59.5,149,1.7);
+$('actors').innerHTML=h}
+
+function badges(){const e=$('qbadge');if(!e)return;let n=0;Q.forEach((q,i)=>{if(st.claimed[i])return;const so=q.k==='soc'?st.soc[q.id]:0,pr=q.k==='lvl'?lvl():q.k==='soc'?(so&&Date.now()-so>=WAIT?1:0):q.k==='wallet'?(st.wallet?1:0):st.stats[q.k];if(pr>=q.g)n++});e.classList.toggle('on',n>0)}
+
+const MQ=window.matchMedia('(min-width:900px)');
+function layout(){const d=MQ.matches;$('scene').classList.toggle('desk',d);for(let i=0;i<16;i++){const b=$('p'+i);if(!b)continue;const c=i%4,r=i>>2;
+if(d){b.style.left=((75+c*11.93)/160*100)+'%';b.style.top=((52+r*7.7)/90*100)+'%';b.style.width=(10.2/160*100)+'%';b.style.height=(6.9/90*100)+'%'}
+else{b.style.left=(21+c*15.17)+'%';b.style.top=((64+r*10.5)/150*100)+'%';b.style.width='12.5%';b.style.height=(8.6/150*100)+'%'}}}
+function buildGrid(){for(let i=0;i<16;i++){const b=document.createElement('button');b.id='p'+i;b.onclick=()=>tap(i);$('scene').appendChild(b)}layout()}
+if(MQ.addEventListener)MQ.addEventListener('change',layout);else if(MQ.addListener)MQ.addListener(layout);
+
+function treesD(){let k=5;const r=()=>(k=(k*9301+49297)%233280)/233280;
+const T=(x,y,s)=>'<use href="#tree" transform="translate('+x.toFixed(1)+' '+y.toFixed(1)+') scale('+s.toFixed(2)+')"/>';
+let b='';for(let x=2;x<160;x+=5.5+r()*2)b+=T(x,26.5+r()*3,.55+r()*.3);
+$('treesD0').innerHTML=b;
+let c='<rect x="104" y="10" width="36" height="22.5" rx="1.5" fill="#8a5d34"/>';
+for(let j=0;j<4;j++)for(let x=106;x<138;x+=2.2){const y=13.5+j*2.6+(r()-.5)*.4,X=(x+(r()-.5)*.4).toFixed(1);c+='<path d="M'+X+' '+y.toFixed(1)+' V'+(y-4.5).toFixed(1)+'" stroke="#4a9e2a" stroke-width=".6"/><path d="M'+X+' '+(y-2).toFixed(1)+' l-1.4 -1.6" stroke="#5fbf3a" stroke-width=".5"/><ellipse cx="'+X+'" cy="'+(y-3.6).toFixed(1)+'" rx=".8" ry="1.5" fill="#f2c230"/>'}
+for(let j=0;j<3;j++)for(let x=105;x<139;x+=2.6){const y=25.2+j*2.5;c+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="1.4" fill="#3f9e2a"/><circle cx="'+(x-.5).toFixed(1)+'" cy="'+(y-.2).toFixed(1)+'" r=".55" fill="#e5322d"/><circle cx="'+(x+.6).toFixed(1)+'" cy="'+(y+.5).toFixed(1)+'" r=".5" fill="#e5322d"/>'}
+$('cropsD').innerHTML=c;
+let h=T(4,53,.9)+T(11,55.5,.7);
+$('treesD').innerHTML=h}
+
+function actorsD(){let h='';
+h+=skybird(8,44,10,184)+skybird(14,60,35,184)+skybird(11,52,22,184);
+for(let i=0;i<3;i++)h+='<g class="puff" style="animation-delay:-'+(i*1.2)+'s"><circle cx="78.7" cy="8" r="1.4" fill="#fff"/></g>';
+h+=person({x:10,y:46,dx:90,t:44,dl:8,c:'#e5322d',prop:'wb',s:1.15});
+h+=person({x:128,y:45,dx:22,t:30,dl:0,c:'#2f6fd0',s:1.15});
+const big=x=>'<g transform="scale(1.15)">'+x+'</g>';
+h+=chicken(135,68,14,11,0)+chicken(142,73,12,14,4)+chicken(137,79,16,9,2)+chicken(150,70,6,12,5)+chicken(146,82,8,16,7);
+h+=person({x:134,y:85,dx:18,t:22,dl:5,c:'#3fa23a',prop:'crate',s:1.1});
+h+=sun(56,87.5,0)+sun(58.8,88.8,1)+sun(130.5,88,.6)+sun(63.5,89,1.7);
+$('actorsD').innerHTML=h}
+
 function paint(){const now=Date.now();st.plots.forEach((p,i)=>{const b=$('p'+i);if(i>=st.open){b.className='plot lock';b.innerHTML='🔒';return}if(!p){b.className='plot';b.innerHTML='';return}const s=SEEDS[p.s],f=Math.min(1,(now-p.at)/dur(s));b.className='plot'+(f>=1?' rdy':'');b.innerHTML=(f>=1?s.e:f>.5?'🌿':'🌱')+(f<1?'<small><i style="width:'+f*100+'%"></i></small>':'')})}
 function addXp(n){const b=lvl();st.xp+=n;if(lvl()>b){st.gems=R4(st.gems+0.1);seeds();const u=SEEDS.find(s=>s.l===lvl());panel('msg','Level Up! 🎉','<p>You reached <b>level '+lvl()+'</b>! You earned 💎 0.1.'+(u?'</p><p>New seed unlocked: '+u.e+' <b>'+u.n+'</b>!</p>':'</p>'))}}
 let AC=null;
@@ -273,7 +619,7 @@ function panel(n,title,html){cur=n;let h=html||'',T=title||'';
 if(n==='shop'){T='🛒 Shop';h=row('💎','Buy Gems','1 💎 = $1 in BIRD at the live market rate.<br><span id="gp">'+(GP||'Loading price…')+'</span>','<button class="btn" data-a="invest">Open</button>')+row('💱','Trade Token','Buy or sell the token on floor.supwars.fun. Trading involves risk.','<button class="btn" data-a="trade">Open</button>')+row('🟫','New Plot','Plots open: '+st.open+'/16',st.open>=16?'<b>MAX</b>':'<button class="btn" data-a="buyplot"'+(st.gems<plotCost()?' disabled':'')+'>💎 '+fmt(plotCost())+'</button>')+row('✨','Super Soil','Level '+st.soil+'/5 · crops grow 10% faster per level',st.soil>=5?'<b>MAX</b>':'<button class="btn" data-a="buysoil"'+(st.gems<soilCost()?' disabled':'')+'>💎 '+fmt(soilCost())+'</button>')+row('🐦','Helper Bird','Owned '+st.helpers+'/3 · auto-harvests ready crops',st.helpers>=3?'<b>MAX</b>':'<button class="btn" data-a="buyhelp"'+(st.gems<helpCost()?' disabled':'')+'>💎 '+fmt(helpCost())+'</button>')}
 if(n==='barn'){T='🏚️ Barn';const tot=R4(st.crops.reduce((a,c,i)=>a+c*SEEDS[i].s,0)*(1-TAX_SELL));h='<button class="btn" data-a="sellall"'+(tot?'':' disabled')+'>Sell everything · 💎 '+fmt(tot)+'</button>'+(TAX_SELL>0?'<p>'+Math.round(TAX_SELL*100)+'% sale tax is already deducted.</p>':'');SEEDS.forEach((s,i)=>{h+=row(s.e,s.n+' × '+st.crops[i],'Sells for 💎 '+fmt(R4(s.s*(1-TAX_SELL)))+(TAX_SELL>0?' each (after tax)':' each'),'<button class="btn" data-a="sell" data-i="'+i+'"'+(st.crops[i]?'':' disabled')+'>Sell</button>')})}
 if(n==='quests'){T='📜 Quests';h='';Q.forEach((q,i)=>{const so=q.k==='soc'?st.soc[q.id]:0,pr=q.k==='lvl'?lvl():q.k==='soc'?(so&&Date.now()-so>=WAIT?1:0):q.k==='wallet'?(st.wallet?1:0):st.stats[q.k],ok=pr>=q.g,cl=st.claimed[i],go=q.k==='soc'&&!so?'<button class="btn" data-a="qgo" data-i="'+i+'">Go</button>':null;h+='<div class="row"><div class="ic">📌</div><div class="tx"><b>'+q.t+'</b><small>'+fmt(Math.min(pr,q.g))+' / '+q.g+' · Reward 💎 '+fmt(q.m)+'</small><div class="pb"><i style="width:'+Math.min(100,pr/q.g*100)+'%"></i></div>'+(q.k==='wallet'?(st.wallet?'<small>'+shortAd(st.wallet)+' <button class="btn red" data-a="disconnect">Disconnect</button></small>':'<small><button class="btn" data-a="wallet">Connect</button></small>'):'')+'</div>'+(cl?'<b>✓</b>':go?go:'<button class="btn" data-a="claim" data-i="'+i+'"'+(ok?'':' disabled')+'>Claim</button>')+'</div>'})}
-if(n==='invest'){T='🏦 Investor';h='<div id="inv">Loading…</div>'}
+if(n==='invest'){T='🪺 Nest';h='<div id="inv">Loading…</div>'}
 if(n==='lb'){T='🏆 Leaderboard';h='<p>Ranked by total XP.</p><div id="sbb"></div>'}
 if(n==='more'){T='⚙️ Menu';h='<button class="btn" data-a="snd">'+(ls('bf_snd')==='0'?'🔇 Sound off':'🔊 Sound on')+'</button> <button class="btn" data-a="about">Meet the Bird</button> <button class="btn" data-a="help">How to play</button> <button class="btn red" data-a="resetq">Reset game</button>'+(st.wallet?'<p>👛 '+shortAd(st.wallet)+' <button class="btn red" data-a="disconnect">Disconnect wallet</button></p>':'')+'<p>Bird Farm · A farming game on the Supra chain. Your progress is saved on this device and your XP is sent to the leaderboard.</p>'}
 if(n==='help'){T='How to play';h='<p>1. Pick a seed at the bottom, then tap an empty plot to plant it.</p><p>2. Wait for it to grow, then tap it to harvest. Harvested crops go to your Barn.</p><p>3. Sell crops in the Barn for 💎 gems (a small sale tax applies). Earn XP to level up and unlock new seeds.</p><p>4. Seeds cost 💎. Spend gems in the Shop on new plots, Super Soil, and Helper Birds. Finish Quests for small gem rewards.</p><p><b>Preview:</b> buying gems with BIRD is not open yet, so you start with 💎 1 to test the farm.</p>'}
@@ -297,11 +643,7 @@ else if(a==='wallet'){connectWallet();return}
 else if(a==='login'){loginFailed=false;login().then(()=>{toast('Signed in');loadInvest()}).catch(e=>toast(e.message||'Sign-in cancelled'));return}
 else if(a==='sellmax'){const e=$('sellg');if(e){e.value=SELLMAX;updSellEst()}return}
 else if(a==='isell'){if(SELLBUSY)return;const g=parseFloat(($('sellg')||{}).value);if(!(g>0)){toast('Enter how many gems to sell');return}if(g>SELLMAX+1e-9){toast('You only have '+SELLMAX+' 💎 to sell');return}SELLBUSY=true;trade('sell',{gems:g}).then(()=>{SELLBUSY=false;loadInvest('Sell request sent. It is paid to your wallet after review.')}).catch(e=>{SELLBUSY=false;toast(e.message)});return}
-else if(a==='ibuynow'){if(QBUSY||PAYBUSY)return;const g=parseFloat(($('buyg')||{}).value);if(!(g>0)){toast('Enter how many gems to buy');return}if(g<BUYMIN||g>BUYMAX){toast('Buy between '+BUYMIN+' and '+BUYMAX+' gems');return}QBUSY=true;trade('quote',{gems:g}).then(async r=>{BQ=r.quote;BQerr='';BQmanual=false;QBUSY=false;await loadInvest();payQuote()}).catch(e=>{QBUSY=false;toast(e.message)});return}
-else if(a==='iquote'){const g=parseFloat(($('buyg')||{}).value);if(!(g>0)){toast('Enter how many gems to buy');return}trade('quote',{gems:g}).then(r=>{BQ=r.quote;BQerr='';BQmanual=false;loadInvest()}).catch(e=>toast(e.message));return}
-else if(a==='ipay'){payQuote();return}
-else if(a==='iretry'){if(BQ&&BQ.tx&&!PAYBUSY){PAYBUSY=true;confirmBuy()}return}
-else if(a==='imanual'){BQmanual=true;loadInvest();return}
+else if(a==='iquote'){const g=parseFloat(($('buyg')||{}).value);if(!(g>0)){toast('Enter how many gems to buy');return}trade('quote',{gems:g}).then(r=>{BQ=r.quote;loadInvest()}).catch(e=>toast(e.message));return}
 else if(a==='ibuy'){const t=(($('txh')||{}).value||'').trim();if(!BQ||!t){toast('Paste the transaction hash');return}trade('buy',{quote_id:BQ.id,tx:t}).then(()=>{BQ=null;loadInvest('Purchase confirmed. Gems added.')}).catch(e=>toast(e.message));return}
 else if(a==='iclaim'){trade('claim').then(()=>loadInvest('Claim request sent. It is paid to your wallet after review.')).catch(e=>toast(e.message));return}
 else if(a==='disconnect'){disconnectWallet();return}
@@ -311,12 +653,52 @@ else if(a==='reset'){st=fresh();lastXp=-1;seeds();$('sheet').hidden=true}
 save();head();paint();if(!$('sheet').hidden&&['shop','barn','quests'].includes(cur))panel(cur)}
 document.addEventListener('click',e=>{const t=e.target.closest('[data-a]');if(t)act(t.dataset.a,t.dataset.i)});
 setInterval(()=>{let n=st.helpers;for(let i=0;i<st.open&&n>0;i++){const p=st.plots[i];if(p&&ready(p)){harvest(i);n--}}if(st.helpers){save();head()}},6000);
-trees();head();seeds();buildGrid();paint();setInterval(paint,500);
-async function updGP(){try{if(!SB)return;const r=await fetch(SUPABASE_URL+'/rest/v1/rpc/gem_price_status',{method:'POST',headers:H,body:'{}'});const d=await r.json();GP=d&&d.ok?'1 💎 = '+Math.round(d.bird_per_gem).toLocaleString()+' BIRD, or '+Math.round(d.bird_per_gem*(1+TAX_BUY)).toLocaleString()+' BIRD with the '+Math.round(TAX_BUY*100)+'% tax.':'Gem price is paused right now.';const e=$('gp');if(e)e.textContent=GP}catch(e){}}
+trees();actors();treesD();actorsD();head();seeds();buildGrid();paint();setInterval(paint,500);setInterval(badges,2000);
+async function updGP(){try{if(!SB)return;const r=await fetch(SUPABASE_URL+'/rest/v1/rpc/gem_price_status',{method:'POST',headers:H,body:'{}'});const d=await r.json();GP=d&&d.ok?'1 💎 = '+Math.round(d.bird_per_gem*(1+TAX_BUY)).toLocaleString()+' BIRD':'Gem price is paused right now.';const e=$('gp');if(e)e.textContent=GP}catch(e){}}
 async function loadEcon(){try{if(!SB)return;const[a,b]=await Promise.all([fetch(SUPABASE_URL+'/rest/v1/seeds_config?select=*&order=sort',{headers:H}).then(r=>r.json()),fetch(SUPABASE_URL+'/rest/v1/economy_config?select=key,value',{headers:H}).then(r=>r.json())]);
 if(Array.isArray(a))a.forEach((d,i)=>{const x=SEEDS[i];if(x){x.c=+d.cost_gems;x.t=+d.grow_secs;x.s=+d.sell_gems;x.l=+d.unlock_lvl}});
 if(Array.isArray(b))b.forEach(d=>{if(d.key==='sell_tax_bps')TAX_SELL=d.value/1e4;if(d.key==='buy_tax_bps')TAX_BUY=d.value/1e4;if(d.key==='settlement_period_days')PAY_DAYS=+d.value;if(d.key==='weekly_budget_bps')BUDGET=d.value/1e4;if(d.key==='wallet_cap_bps')CAP=d.value/1e4});
 seeds();head();paint()}catch(e){}}
 loadEcon();restoreWallet();
 if(!st.seen){st.seen=1;save();panel('help')}
+
+/* min profit guard */
+const MARGIN=1.3;{const _sd=seeds;seeds=function(){SEEDS.forEach(x=>{x.s=Math.max(x.s,R4(x.c*MARGIN))});_sd()}}
+/* ===== v3 sound: synthesized SFX + ambient music (no audio files) ===== */
+(()=>{
+const on=()=>ls('bf_snd')!=='0',mon=()=>on()&&ls('bf_mus')!=='0';
+let M,SG,MG;
+function ctx(){if(!AC){AC=new(window.AudioContext||window.webkitAudioContext)();const c=AC.createDynamicsCompressor();M=AC.createGain();M.gain.value=.9;M.connect(c);c.connect(AC.destination);SG=AC.createGain();SG.gain.value=.8;SG.connect(M);MG=AC.createGain();MG.gain.value=0;MG.connect(M)}if(AC.state==='suspended')AC.resume();return AC}
+const tone=(f,t,d,ty,v,to,dst)=>{const o=AC.createOscillator(),g=AC.createGain();o.type=ty||'sine';o.frequency.setValueAtTime(f,t);if(to)o.frequency.exponentialRampToValueAtTime(to,t+d);g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(v||.2,t+.012);g.gain.exponentialRampToValueAtTime(.0001,t+d);o.connect(g);g.connect(dst||SG);o.start(t);o.stop(t+d+.05)};
+const noise=(t,d,fq,v)=>{const n=AC.sampleRate*d|0,b=AC.createBuffer(1,n,AC.sampleRate),a=b.getChannelData(0);for(let i=0;i<n;i++)a[i]=(Math.random()*2-1)*(1-i/n);const s=AC.createBufferSource(),f=AC.createBiquadFilter(),g=AC.createGain();s.buffer=b;f.type='bandpass';f.frequency.value=fq;g.gain.value=v;s.connect(f);f.connect(g);g.connect(SG);s.start(t)};
+const N=m=>440*2**((m-69)/12);
+const S={
+click:t=>tone(700,t,.07,'triangle',.16,420),
+pop:t=>{tone(380,t,.1,'sine',.2,760);tone(760,t+.07,.1,'sine',.1)},
+close:t=>tone(600,t,.09,'sine',.16,300),
+plant:t=>{tone(520,t,.14,'sine',.3,180);noise(t+.02,.12,900,.3);tone(660,t+.14,.14,'triangle',.16,990)},
+harvest:t=>{[72,76,79,84].forEach((m,i)=>tone(N(m),t+i*.06,.18,'triangle',.18));noise(t,.08,2500,.12)},
+coin:t=>{tone(N(88),t,.12,'square',.06);tone(N(95),t+.07,.35,'square',.06);tone(N(95),t+.07,.35,'sine',.12)},
+ready:t=>{tone(N(84),t,.25,'sine',.15);tone(N(91),t+.12,.35,'sine',.13)},
+error:t=>{tone(200,t,.12,'square',.06,150);tone(150,t+.1,.15,'square',.06,110)},
+level:t=>[72,76,79,84,88].forEach((m,i)=>{tone(N(m),t+i*.1,.3,'triangle',.2);tone(N(m)/2,t+i*.1,.3,'sine',.1)}),
+chirp:t=>{const f=2200+Math.random()*900;tone(f,t,.07,'sine',.05,f*1.3);tone(f*1.2,t+.1,.07,'sine',.04,f*.9);tone(f*1.3,t+.2,.09,'sine',.04,f*1.5)},
+cluck:t=>{tone(300,t,.06,'sawtooth',.035,220);tone(260,t+.09,.07,'sawtooth',.035,190)}};
+const sfx=n=>{if(!on())return;try{ctx();S[n](AC.currentTime)}catch(e){}};
+sfxPlant=()=>sfx('plant');
+const w=(n,f)=>{const o=window[n];window[n]=function(){const r=o.apply(this,arguments);try{f.apply(null,arguments)}catch(e){}return r}};
+w('harvest',()=>sfx('harvest'));w('act',a=>{if(a==='sell'||a==='sellall')setTimeout(()=>sfx('coin'),60)});
+const ax=addXp;addXp=function(n){const b=lvl();ax(n);if(lvl()>b)setTimeout(()=>sfx('level'),250)};
+w('toast',t=>{t=String(t);if(/^Not enough|locked|Unlock the previous|Reach level|Nothing ready|cancelled|Could not/i.test(t))sfx('error');else if(/sold|claimed|unlocked|bought|purchase|earned|added/i.test(t))sfx('coin')});
+w('panel',n=>{if(n!=='farm')sfx('pop');if(n==='more'){const b=$('sb');if(b)b.insertAdjacentHTML('afterbegin','<button class="btn" data-a="mus">'+(ls('bf_mus')==='0'?'🎵 Music off':'🎵 Music on')+'</button> ')}});
+document.addEventListener('pointerdown',e=>{if(on()){try{ctx()}catch(_){}}const t=e.target.closest&&e.target.closest('button,.plot,.seed');if(t)sfx(t.classList.contains('x')?'close':'click')},true);
+document.addEventListener('click',e=>{const b=e.target.closest('[data-a="mus"]');if(b){ls('bf_mus',ls('bf_mus')==='0'?'1':'0');b.textContent=ls('bf_mus')==='0'?'🎵 Music off':'🎵 Music on'}});
+let pr=-1;setInterval(()=>{try{const c=st.plots.slice(0,st.open).filter(p=>p&&ready(p)).length;if(pr>=0&&c>pr)sfx('ready');pr=c}catch(e){}},1000);
+(function amb(){setTimeout(()=>{if(on()&&AC&&AC.state==='running'&&!document.hidden)sfx(Math.random()<.6?'chirp':'cluck');amb()},7000+Math.random()*8000)})();
+const prog=[[60,64,67],[57,60,64],[53,57,60],[55,59,62]],pent=[72,74,76,79,81,84];let nb=0,nx=0,mi=2;
+setInterval(()=>{if(!AC||!MG)return;MG.gain.setTargetAtTime(mon()?1:0,AC.currentTime,.3);if(!mon()||AC.state!=='running')return;const spb=60/84;if(nx<AC.currentTime)nx=AC.currentTime+.05;
+while(nx<AC.currentTime+1.2){const c=prog[nb%4];c.forEach(m=>tone(N(m-12),nx,spb*4,'sine',.05,0,MG));tone(N(c[0]-24),nx,spb*2,'triangle',.07,0,MG);
+for(let i=0;i<8;i++)if(Math.random()<.6){mi=Math.max(0,Math.min(5,mi+[-1,0,1,2,-2][Math.random()*5|0]));tone(N(pent[mi]),nx+i*spb/2,spb*.9,'triangle',.06,0,MG)}nx+=spb*4;nb++}},300);
+document.addEventListener('visibilitychange',()=>{if(!AC)return;document.hidden?AC.suspend():(on()&&AC.resume())});
+})();
 </script></body></html>
