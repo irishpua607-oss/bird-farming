@@ -428,19 +428,19 @@ body{background:linear-gradient(#bfe6ff 0,#d9f2c0 38%,#a8dc72 100%) fixed}
 </div>
 <div class="sheet" id="sheet" hidden><div class="card"><h2><span id="st"></span><button class="x" data-a="farm">✕</button></h2><div id="sb"></div></div></div>
 <script>
-const SEEDS=[{n:'Wheat',e:'🌾',c:0.1,t:1800,s:0.13,l:1,x:4},{n:'Carrot',e:'🥕',c:0.25,t:3600,s:0.325,l:1,x:9},{n:'Corn',e:'🌽',c:0.5,t:7200,s:0.65,l:2,x:24},{n:'Pumpkin',e:'🎃',c:1,t:14400,s:1.3,l:3,x:70},{n:'Strawberry',e:'🍓',c:2,t:28800,s:2.6,l:4,x:140}];
+const SEEDS=[{n:'Wheat',e:'🌾',c:0.1,t:1800,s:0.1,l:1,x:4},{n:'Carrot',e:'🥕',c:0.25,t:3600,s:0.25,l:1,x:9},{n:'Corn',e:'🌽',c:0.5,t:7200,s:0.5,l:2,x:24},{n:'Pumpkin',e:'🎃',c:1,t:14400,s:1,l:3,x:70},{n:'Strawberry',e:'🍓',c:2,t:28800,s:2,l:4,x:140}];
 const Q=[{t:'Harvest 10 crops',k:'harv',g:10,c:50,m:1},{t:'Plant 15 seeds',k:'plant',g:15,c:60,m:1},{t:'Sell 0.5 💎 worth of crops',k:'earn',g:0.5,c:0,m:2},{t:'Reach level 4',k:'lvl',g:4,c:150,m:3},
 {t:'Follow @suprabird_ on X',k:'soc',id:'follow',url:'https://x.com/suprabird_',g:1,c:100,m:2},
 {t:'Retweet the pinned post on X',k:'soc',id:'rt',url:'https://x.com/suprabird_/status/2116444049288614143',g:1,c:100,m:2},
 {t:'Join the Telegram group',k:'soc',id:'tg',url:'https://t.me/supra_bird',g:1,c:100,m:2},
 {t:'Connect your Supra wallet',k:'wallet',g:1,c:200,m:3}];
 const WAIT=8000,TRADE_URL='https://floor.supwars.fun/t/0x38eb2b5380cfa493031ed527077598e3024465bd27f09dd0dd86ddcab34f5e81';
-const R4=n=>Math.round(n*1e4)/1e4,fmt=n=>String(R4(n)),SPEED=0.2;
+let FREE_BPS=10;const R8=n=>Math.round(n*1e8)/1e8;const R4=n=>Math.round(n*1e4)/1e4,fmt=n=>String(R4(n)),SPEED=0.2;
 const fmtT=t=>t>=3600?Math.floor(t/3600)+'h '+Math.floor(t%3600/60)+'m':t>=60?Math.floor(t/60)+'m '+(t%60)+'s':t+'s';
 Q.forEach(q=>{q.c=0;q.m=R4(q.m/10)});
 let TAX_SELL=0,TAX_BUY=0.05,GP='',PAY_DAYS=7,BUDGET=0.4,CAP=0.1;
 const KEY='birdfarm4';
-const fresh=()=>({coins:0,gems:1,xp:0,sel:0,plots:Array(16).fill(null),open:6,crops:[0,0,0,0,0],stats:{harv:0,plant:0,earn:0},claimed:{},soc:{},wallet:'',soil:0,helpers:0,seen:0});
+const fresh=()=>({fp:0,coins:0,gems:1,xp:0,sel:0,plots:Array(16).fill(null),open:6,crops:[0,0,0,0,0],stats:{harv:0,plant:0,earn:0},claimed:{},soc:{},wallet:'',soil:0,helpers:0,seen:0});
 let st=fresh(),cur='farm';
 try{const r=localStorage.getItem(KEY);if(r){const o=JSON.parse(r);if(o&&o.plots&&o.plots.length===16)st=Object.assign(fresh(),o)}}catch(e){}
 const $=id=>document.getElementById(id);
@@ -452,8 +452,17 @@ const SUPABASE_URL='https://zqcxaqssuhnkxbchhznp.supabase.co',SUPABASE_ANON_KEY=
 const SB=SUPABASE_URL&&SUPABASE_ANON_KEY,H={apikey:SUPABASE_ANON_KEY,Authorization:'Bearer '+SUPABASE_ANON_KEY,'Content-Type':'application/json'};
 const ls=(k,v)=>{try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){}};
 let pid=ls('bf_pid');if(!pid){pid=(crypto.randomUUID?crypto.randomUUID():'p'+Date.now()+Math.random().toString(16).slice(2));ls('bf_pid',pid)}
+let pkey=ls('bf_key');if(!pkey||pkey.length<20){pkey=(crypto.randomUUID?crypto.randomUUID()+crypto.randomUUID():'k'+Date.now()+Math.random().toString(16).slice(2)+Math.random().toString(16).slice(2));ls('bf_key',pkey)}
+let rev=+(ls('bf_rev')||0),stateReady=false,pushing=false,lastPush=0;
+const stateFn=(action,body)=>fetch(SUPABASE_URL+'/functions/v1/state',{method:'POST',headers:H,body:JSON.stringify({action,id:pid,key:pkey,...body})}).then(r=>r.json().catch(()=>({})).then(j=>({ok:r.ok,status:r.status,j})));
+const adopt=(o,r)=>{if(o&&o.plots&&o.plots.length===16){st=Object.assign(fresh(),o);rev=r;ls('bf_rev',rev);ls(KEY,JSON.stringify(st));try{seeds();head();paint()}catch(e){}}};
+async function statePush(force){if(!SB||pushing||(!stateReady&&!force))return;const n=Date.now();if(!force&&n-lastPush<10000)return;pushing=true;lastPush=n;
+try{const r=await stateFn('save',{state:st,rev});if(r.ok){rev=r.j.rev;ls('bf_rev',rev);if(r.j.state&&(+r.j.state.xp!==st.xp||+r.j.state.fp!==+st.fp)){st.xp=r.j.state.xp;st.fp=r.j.state.fp}}
+else if(r.status===409){if(r.j.state)adopt(r.j.state,r.j.rev);else{const l=await stateFn('load');if(l.ok&&l.j.state)adopt(l.j.state,l.j.rev)}}}catch(e){}pushing=false}
+async function stateLoad(){if(!SB)return;try{const r=await stateFn('load');if(r.ok){if(r.j.state){adopt(r.j.state,r.j.rev);stateReady=true}else{stateReady=true;await statePush(true)}}}catch(e){}}
+const scoreFn=body=>fetch(SUPABASE_URL+'/functions/v1/score',{method:'POST',headers:H,body:JSON.stringify({id:pid,key:pkey,...body})});
 let pname=ls('bf_name')||'',lastSync=0,lastXp=-1;
-const save=()=>{ls(KEY,JSON.stringify(st));sync()};
+const save=()=>{ls(KEY,JSON.stringify(st));sync();statePush()};
 const addrOf=x=>Array.isArray(x)?addrOf(x[0]):(x&&typeof x==='object'?(x.address||x.account||(x.accounts&&addrOf(x.accounts))):x);
 async function waitProvider(ms){ms=ms==null?4000:ms;const t=Date.now();for(;;){const p=window.starkey&&window.starkey.supra;if(p||Date.now()-t>=ms)return p||null;await new Promise(r=>setTimeout(r,200))}}
 async function ensureConnected(p){let a=null;try{a=await p.account()}catch(e){}if(addrOf(a))return a;return await p.connect()}
@@ -527,9 +536,9 @@ return row('🛒','Buy gems','Min '+s.buy_min_gems+' · max '+s.buy_max_gems+' �
 function invHtml(s,msg){let h=msg?'<p><b>'+eh(msg)+'</b></p>':'';const gp=s.price&&+s.price.bird_per_gem?+s.price.bird_per_gem:0;
 if(!s.investor)return h+'<p><b>Early Birds only.</b> The Nest is for wallets that bought 💎 gems with BIRD. Free players farm and keep their gems in the game.</p>'+buyRow(s);
 h+=row('💎','Your paid gems','1 💎 ≈ '+(gp?nb(gp)+' BIRD':'…')+' (live price)','<b>'+fmt(s.paid_gems)+'</b>');
-h+=row('🪙','Rewards ready','Up to 0.1% a day on your paid gems. Not guaranteed: it drops when the reward fund runs low. '+(s.claim_tax_bps/100)+'% tax on claims.','<b>'+nb(s.claimable_bird)+' BIRD</b><br><button class="btn" data-a="iclaim"'+(s.can_claim&&s.claimable_bird>0?'':' disabled')+'>Claim</button>');
+if(+s.claimable_bird>0)h+=row('🪙','Profit','','<b>'+nb(s.claimable_bird)+' BIRD</b><br><button class="btn" data-a="iclaim"'+(s.can_claim?'':' disabled')+'>Claim</button>');
 SELLP=+s.sell_bird_per_gem||0;SELLFEE=(+s.sell_fee_bps||0)/10000;SELLMAX=+s.paid_gems||0;
-h+=row('💱','Sell gems','You get BIRD at '+(SELLP?nb(SELLP)+' per 💎':'the live price')+' (never above what you paid) minus a '+(s.sell_fee_bps/100)+'% fee, sent to your wallet after review.<br><span id="sellest">You get ≈ 0 BIRD</span>'+(s.can_sell?'':' <b>Selling is not open yet.</b>'),'<input id="sellg" type="number" min="0" step="any" placeholder="Gems"><br><button class="btn" data-a="sellmax"'+(s.can_sell&&s.paid_gems>0?'':' disabled')+'>Max</button> <button class="btn" data-a="isell"'+(s.can_sell&&s.paid_gems>0?'':' disabled')+'>Sell</button>');
+h+=row('💱','Sell gems',(SELLP?nb(SELLP)+' BIRD per 💎':'Live price')+'<br><span id="sellest"></span>'+(s.can_sell?'':' <b>Soon</b>'),'<input id="sellg" type="number" min="0" step="any" placeholder="Gems"><br><button class="btn" data-a="sellmax"'+(s.can_sell&&s.paid_gems>0?'':' disabled')+'>Max</button> <button class="btn" data-a="isell"'+(s.can_sell&&s.paid_gems>0?'':' disabled')+'>Sell</button>');
 h+=buyRow(s);
 const rec=[...(s.withdrawals||[]).map(w=>'Sell '+fmt(w.gems)+' 💎 · '+nb(w.net_bird)+' BIRD · '+w.status),...(s.claims||[]).map(c=>'Claim '+nb(c.net_bird)+' BIRD · '+c.status)];
 return h+(rec.length?'<p><small>Recent: '+rec.map(eh).join(' | ')+'</small></p>':'')}
@@ -547,11 +556,11 @@ try{const s=await trade('status');if(s.bird_balance!=null){BB=+s.bird_balance;BB
 const shortAd=a=>a?a.slice(0,6)+'…'+a.slice(-4):'';
 async function disconnectWallet(){try{const p=window.starkey&&window.starkey.supra;if(p&&typeof p.disconnect==='function'){try{await p.disconnect()}catch(e){}}}catch(e){}
 st.wallet='';SESS=null;loginFailed=false;try{localStorage.removeItem('bf_sess')}catch(e){}lastXp=-1;save();
-if(SB){try{fetch(SUPABASE_URL+'/rest/v1/scores?id=eq.'+encodeURIComponent(pid),{method:'PATCH',headers:{...H,Prefer:'return=minimal'},body:JSON.stringify({wallet:null})}).catch(()=>{})}catch(e){}}
+if(SB){try{scoreFn({name:pname||'Farmer',clear_wallet:true}).catch(()=>{})}catch(e){}}
 sync(true);toast('Wallet disconnected.');if(!$('sheet').hidden)panel(cur==='more'?'more':'quests')}
 function sync(force){if(!SB||!pname||st.xp===lastXp)return;const n=Date.now();if(!force&&n-lastSync<15000)return;lastSync=n;lastXp=st.xp;
-fetch(SUPABASE_URL+'/rest/v1/scores',{method:'POST',headers:{...H,Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({id:pid,name:pname,xp:st.xp,lvl:lvl(),harv:st.stats.harv,wallet:st.wallet||null,updated_at:new Date().toISOString()})}).then(r=>{if(!r.ok)lastXp=-1}).catch(()=>{lastXp=-1})}
-document.addEventListener('visibilitychange',()=>{if(document.hidden){ls(KEY,JSON.stringify(st));sync(true)}});
+scoreFn({name:pname,xp:st.xp,lvl:lvl(),harv:st.stats.harv,wallet:st.wallet||null}).then(r=>{if(!r.ok)lastXp=-1}).catch(()=>{lastXp=-1})}
+document.addEventListener('visibilitychange',()=>{if(document.hidden){ls(KEY,JSON.stringify(st));sync(true);statePush(true)}});
 const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 async function board(){const el=$('sb');
 if(!SB){el.innerHTML='<p>The leaderboard is not available right now. Your progress is still saved on this device.</p>';return}
@@ -644,7 +653,7 @@ const o=AC.createOscillator(),g=AC.createGain();o.type='sine';o.frequency.setVal
 const n=AC.sampleRate*.12|0,b=AC.createBuffer(1,n,AC.sampleRate),d=b.getChannelData(0);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*(1-i/n);
 const s=AC.createBufferSource(),f=AC.createBiquadFilter(),g2=AC.createGain();s.buffer=b;f.type='lowpass';f.frequency.value=900;g2.gain.value=.25;s.connect(f);f.connect(g2);g2.connect(AC.destination);s.start(t+.02);
 const o2=AC.createOscillator(),g3=AC.createGain();o2.type='triangle';o2.frequency.setValueAtTime(660,t+.14);o2.frequency.exponentialRampToValueAtTime(990,t+.26);g3.gain.setValueAtTime(.0001,t+.14);g3.gain.exponentialRampToValueAtTime(.18,t+.16);g3.gain.exponentialRampToValueAtTime(.0001,t+.28);o2.connect(g3);g3.connect(AC.destination);o2.start(t+.14);o2.stop(t+.3)}catch(e){}}
-function harvest(i){const p=st.plots[i],s=SEEDS[p.s];st.crops[p.s]++;st.plots[i]=null;st.stats.harv++;addXp(s.x);toast('Harvested '+s.e+' '+s.n+'! Sell it in the Barn.')}
+function harvest(i){const p=st.plots[i],s=SEEDS[p.s];st.crops[p.s]++;st.plots[i]=null;st.stats.harv++;st.fp=R8((+st.fp||0)+s.c*FREE_BPS/1e4*s.t/86400);addXp(s.x);toast('Harvested '+s.e+' '+s.n+'! Sell it in the Barn.')}
 function tap(i){if(i>=st.open){if(i>st.open){toast('Unlock the previous plot first');return}panel('msg','Unlock Plot','<p>Open a new plot for 💎 '+fmt(plotCost())+'?</p><button class="btn" data-a="buyplot">Unlock</button>');return}
 const p=st.plots[i];
 if(!p){const s=SEEDS[st.sel];if(lvl()<s.l){toast(s.n+' is locked');return}if(st.gems<s.c){toast('Not enough 💎. Sell crops from your Barn.');return}st.gems=R4(st.gems-s.c);st.plots[i]={s:st.sel,at:Date.now()};st.stats.plant++;sfxPlant();toast('Planted '+s.n+'!')}
@@ -654,7 +663,7 @@ save();head();paint()}
 const row=(ic,t,sub,btn)=>'<div class="row"><div class="ic">'+ic+'</div><div class="tx"><b>'+t+'</b><small>'+sub+'</small></div>'+btn+'</div>';
 function panel(n,title,html){cur=n;let h=html||'',T=title||'';
 if(n==='shop'){T='🛒 Shop';h=row('💎','Buy Gems','1 💎 = $1 in BIRD at the live market rate.<br><span id="gp">'+(GP||'Loading price…')+'</span>','<button class="btn" data-a="invest">Open</button>')+row('💱','Trade Token','Buy or sell the token on floor.supwars.fun. Trading involves risk.','<button class="btn" data-a="trade">Open</button>')+row('🟫','New Plot','Plots open: '+st.open+'/16',st.open>=16?'<b>MAX</b>':'<button class="btn" data-a="buyplot"'+(st.gems<plotCost()?' disabled':'')+'>💎 '+fmt(plotCost())+'</button>')+row('✨','Super Soil','Level '+st.soil+'/5 · crops grow 10% faster per level',st.soil>=5?'<b>MAX</b>':'<button class="btn" data-a="buysoil"'+(st.gems<soilCost()?' disabled':'')+'>💎 '+fmt(soilCost())+'</button>')+row('🐦','Helper Bird','Owned '+st.helpers+'/3 · auto-harvests ready crops',st.helpers>=3?'<b>MAX</b>':'<button class="btn" data-a="buyhelp"'+(st.gems<helpCost()?' disabled':'')+'>💎 '+fmt(helpCost())+'</button>')}
-if(n==='barn'){T='🏚️ Barn';const tot=R4(st.crops.reduce((a,c,i)=>a+c*SEEDS[i].s,0)*(1-TAX_SELL));h='<button class="btn" data-a="sellall"'+(tot?'':' disabled')+'>Sell everything · 💎 '+fmt(tot)+'</button>'+(TAX_SELL>0?'<p>'+Math.round(TAX_SELL*100)+'% sale tax is already deducted.</p>':'');SEEDS.forEach((s,i)=>{h+=row(s.e,s.n+' × '+st.crops[i],'Sells for 💎 '+fmt(R4(s.s*(1-TAX_SELL)))+(TAX_SELL>0?' each (after tax)':' each'),'<button class="btn" data-a="sell" data-i="'+i+'"'+(st.crops[i]?'':' disabled')+'>Sell</button>')})}
+if(n==='barn'){T='🏚️ Barn';const tot=R4(st.crops.reduce((a,c,i)=>a+c*SEEDS[i].s,0)*(1-TAX_SELL));h='<button class="btn" data-a="sellall"'+(tot?'':' disabled')+'>Sell everything · 💎 '+fmt(tot)+'</button>'+(TAX_SELL>0?'<p>'+Math.round(TAX_SELL*100)+'% sale tax is already deducted.</p>':'')+'<p>🔒 Accrued profit: '+(+st.fp||0).toFixed(6)+' 💎 (0.1%/day) · locked until free withdrawals open.</p>';SEEDS.forEach((s,i)=>{h+=row(s.e,s.n+' × '+st.crops[i],'Sells for 💎 '+fmt(R4(s.s*(1-TAX_SELL)))+(TAX_SELL>0?' each (after tax)':' each'),'<button class="btn" data-a="sell" data-i="'+i+'"'+(st.crops[i]?'':' disabled')+'>Sell</button>')})}
 if(n==='quests'){T='📜 Quests';h='';Q.forEach((q,i)=>{const so=q.k==='soc'?st.soc[q.id]:0,pr=q.k==='lvl'?lvl():q.k==='soc'?(so&&Date.now()-so>=WAIT?1:0):q.k==='wallet'?(st.wallet?1:0):st.stats[q.k],ok=pr>=q.g,cl=st.claimed[i],go=q.k==='soc'&&!so?'<button class="btn" data-a="qgo" data-i="'+i+'">Go</button>':null;h+='<div class="row"><div class="ic">📌</div><div class="tx"><b>'+q.t+'</b><small>'+fmt(Math.min(pr,q.g))+' / '+q.g+' · Reward 💎 '+fmt(q.m)+'</small><div class="pb"><i style="width:'+Math.min(100,pr/q.g*100)+'%"></i></div>'+(q.k==='wallet'?(st.wallet?'<small>'+shortAd(st.wallet)+' <button class="btn red" data-a="disconnect">Disconnect</button></small>':'<small><button class="btn" data-a="wallet">Connect</button></small>'):'')+'</div>'+(cl?'<b>✓</b>':go?go:'<button class="btn" data-a="claim" data-i="'+i+'"'+(ok?'':' disabled')+'>Claim</button>')+'</div>'})}
 if(n==='invest'){T='🪺 Nest';h='<div id="inv">Loading…</div>'}
 if(n==='lb'){T='🏆 Leaderboard';h='<p>Ranked by total XP.</p><div id="sbb"></div>'}
@@ -695,9 +704,9 @@ trees();actors();treesD();actorsD();head();seeds();buildGrid();paint();setInterv
 async function updGP(){try{if(!SB)return;const r=await fetch(SUPABASE_URL+'/rest/v1/rpc/gem_price_status',{method:'POST',headers:H,body:'{}'});const d=await r.json();GP=d&&d.ok?'1 💎 = '+Math.round(d.bird_per_gem*(1+TAX_BUY)).toLocaleString()+' BIRD':'Gem price is paused right now.';const e=$('gp');if(e)e.textContent=GP}catch(e){}}
 async function loadEcon(){try{if(!SB)return;const[a,b]=await Promise.all([fetch(SUPABASE_URL+'/rest/v1/seeds_config?select=*&order=sort',{headers:H}).then(r=>r.json()),fetch(SUPABASE_URL+'/rest/v1/economy_config?select=key,value',{headers:H}).then(r=>r.json())]);
 if(Array.isArray(a))a.forEach((d,i)=>{const x=SEEDS[i];if(x){x.c=+d.cost_gems;x.t=+d.grow_secs;x.s=+d.sell_gems;x.l=+d.unlock_lvl}});
-if(Array.isArray(b))b.forEach(d=>{if(d.key==='sell_tax_bps')TAX_SELL=d.value/1e4;if(d.key==='buy_tax_bps')TAX_BUY=d.value/1e4;if(d.key==='settlement_period_days')PAY_DAYS=+d.value;if(d.key==='weekly_budget_bps')BUDGET=d.value/1e4;if(d.key==='wallet_cap_bps')CAP=d.value/1e4});
+if(Array.isArray(b))b.forEach(d=>{if(d.key==='crop_daily_profit_bps')FREE_BPS=+d.value;if(d.key==='sell_tax_bps')TAX_SELL=d.value/1e4;if(d.key==='buy_tax_bps')TAX_BUY=d.value/1e4;if(d.key==='settlement_period_days')PAY_DAYS=+d.value;if(d.key==='weekly_budget_bps')BUDGET=d.value/1e4;if(d.key==='wallet_cap_bps')CAP=d.value/1e4});
 seeds();head();paint()}catch(e){}}
-loadEcon();restoreWallet();
+loadEcon();restoreWallet();stateLoad();
 if(!st.seen){st.seen=1;save();panel('help')}
 
 /* min profit guard */
