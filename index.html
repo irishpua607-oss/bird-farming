@@ -435,7 +435,7 @@ const Q=[{t:'Harvest 10 crops',k:'harv',g:10,c:50,m:1},{t:'Plant 15 seeds',k:'pl
 {t:'Join the Telegram group',k:'soc',id:'tg',url:'https://t.me/supra_bird',g:1,c:100,m:2},
 {t:'Connect your Supra wallet',k:'wallet',g:1,c:200,m:3}];
 const WAIT=8000,TRADE_URL='https://floor.supwars.fun/t/0x38eb2b5380cfa493031ed527077598e3024465bd27f09dd0dd86ddcab34f5e81';
-let FREE_BPS=10;const RATES={};const R8=n=>Math.round(n*1e8)/1e8;const R4=n=>Math.round(n*1e4)/1e4,fmt=n=>String(R4(n)),SPEED=0.2;
+let FREE_BPS=10;const R8=n=>Math.round(n*1e8)/1e8;const R4=n=>Math.round(n*1e4)/1e4,fmt=n=>String(R4(n)),SPEED=0.2;
 const fmtT=t=>t>=3600?Math.floor(t/3600)+'h '+Math.floor(t%3600/60)+'m':t>=60?Math.floor(t/60)+'m '+(t%60)+'s':t+'s';
 Q.forEach(q=>{q.c=0;q.m=R4(q.m/10)});
 let TAX_SELL=0,TAX_BUY=0.05,GP='',PAY_DAYS=7,BUDGET=0.4,CAP=0.1;
@@ -533,24 +533,13 @@ if(!s.can_buy)return row('🛒','Buy gems','Buying is not open for your wallet y
 const tx=(s.buy_tax_bps/100)+'% tax';
 if(BQ&&MANUAL)return row('🛒','Pay '+(+BQ.total_bird)+' BIRD','Send exactly this amount of BIRD from your connected wallet to the address below, then paste the transaction hash. Quote valid until '+new Date(BQ.expires_at).toLocaleTimeString()+'.'+(BB!==null&&BBat===st.wallet&&BB<BQ.total_bird?' <b>Your wallet has only '+nb(BB)+' BIRD.</b>':'')+'<br><small style="word-break:break-all"><b>'+eh(BQ.treasury)+'</b></small>','<input id="txh" placeholder="0x… tx hash" value="'+eh(LASTTX)+'"><br><button class="btn" data-a="ibuy">Verify</button>');
 return row('🛒','Buy gems','Min '+s.buy_min_gems+' · max '+s.buy_max_gems+' 💎. Your wallet will ask you to confirm the payment.','<input id="buyg" type="number" min="'+s.buy_min_gems+'" step="any" placeholder="Gems"><br><button class="btn" data-a="ibuynow">Buy</button>');}
-let PLBUSY=false;const SEEDID=['wheat','carrot','corn','pumpkin','strawberry'];
-const leftTxt=ms=>{const m=Math.max(1,Math.ceil(ms/60000));return m>=60?Math.floor(m/60)+'h '+(m%60)+'m':m+'m'};
-function farmRows(s){let h='';const now=Date.now();
-(s.plantings||[]).forEach(p=>{const k=SEEDID.indexOf(p.seed_id),sd=SEEDS[k]||{e:'🌱',n:p.seed_id},at=new Date(p.ready_at).getTime(),rd=at<=now;
-h+=row(sd.e||'🌱',eh(sd.n||p.seed_id)+' · '+fmt(p.gems)+' 💎',rd?'Ready':'Ready in '+leftTxt(at-now),rd?'<button class="btn" data-a="iharvest" data-i="'+(+p.id)+'">Harvest</button>':'')});
-const opts=SEEDS.map((x,k)=>'<option value="'+SEEDID[k]+'"'+(+s.paid_gems+1e-9>=x.c?'':' disabled')+'>'+x.e+' '+x.n+' · '+fmt(x.c)+' 💎</option>').join('');
-h+=row('🌱','Plant gems','Harvest once a day','<select id="plantseed">'+opts+'</select><br><button class="btn" data-a="iplant">Plant</button> <button class="btn" data-a="iplantall"'+(+s.paid_gems+1e-9>=Math.min(...SEEDS.map(x=>x.c))?'':' disabled')+'>All</button>');return h}
-function ratesRow(){const r=RATES;if(r.buy_tax_bps===undefined||r.crop_daily_profit_bps===undefined)return'';const p=v=>(+v/100)+'%';
-const bonus=+r.crop_bonus_days>0&&+r.crop_bonus_profit_bps>0?p(r.crop_bonus_profit_bps)+' per day for the first '+r.crop_bonus_days+' days of a wallet (from its first gem purchase), then ':'';
-return row('📊','Rates and fees','Crop profit: '+bonus+p(r.crop_daily_profit_bps)+' per day<br>Buy tax '+p(r.buy_tax_bps)+' · Sell fee '+p(r.principal_withdraw_fee_bps)+' · Claim tax '+p(r.claim_tax_bps)+(+r.daily_cap_gems>0?'<br>Profit cap: '+r.daily_cap_gems+' gems’ worth per day per wallet':''),'')}
 function invHtml(s,msg){let h=msg?'<p><b>'+eh(msg)+'</b></p>':'';const gp=s.price&&+s.price.bird_per_gem?+s.price.bird_per_gem:0;
-if(!s.investor)return h+'<p><b>Early Birds only.</b> The Nest is for wallets that bought 💎 gems with BIRD. Free players farm and keep their gems in the game.</p>'+buyRow(s)+ratesRow();
+if(!s.investor)return h+'<p><b>Early Birds only.</b> The Nest is for wallets that bought 💎 gems with BIRD. Free players farm and keep their gems in the game.</p>'+buyRow(s);
 h+=row('💎','Your paid gems','1 💎 ≈ '+(gp?nb(gp)+' BIRD':'…')+' (live price)','<b>'+fmt(s.paid_gems)+'</b>');
-h+=farmRows(s);
 if(+s.claimable_bird>0)h+=row('🪙','Profit','','<b>'+nb(s.claimable_bird)+' BIRD</b><br><button class="btn" data-a="iclaim"'+(s.can_claim?'':' disabled')+'>Claim</button>');
 SELLP=+s.sell_bird_per_gem||0;SELLFEE=(+s.sell_fee_bps||0)/10000;SELLMAX=+s.paid_gems||0;
 h+=row('💱','Sell gems',(SELLP?nb(SELLP)+' BIRD per 💎':'Live price')+'<br><span id="sellest"></span>'+(s.can_sell?'':' <b>Soon</b>'),'<input id="sellg" type="number" min="0" step="any" placeholder="Gems"><br><button class="btn" data-a="sellmax"'+(s.can_sell&&s.paid_gems>0?'':' disabled')+'>Max</button> <button class="btn" data-a="isell"'+(s.can_sell&&s.paid_gems>0?'':' disabled')+'>Sell</button>');
-h+=buyRow(s)+ratesRow();
+h+=buyRow(s);
 const rec=[...(s.withdrawals||[]).map(w=>'Sell '+fmt(w.gems)+' 💎 · '+nb(w.net_bird)+' BIRD · '+w.status),...(s.claims||[]).map(c=>'Claim '+nb(c.net_bird)+' BIRD · '+c.status)];
 return h+(rec.length?'<p><small>Recent: '+rec.map(eh).join(' | ')+'</small></p>':'')}
 let loginBusy=false,loginFailed=false,loginErr='';
@@ -674,7 +663,7 @@ save();head();paint()}
 const row=(ic,t,sub,btn)=>'<div class="row"><div class="ic">'+ic+'</div><div class="tx"><b>'+t+'</b><small>'+sub+'</small></div>'+btn+'</div>';
 function panel(n,title,html){cur=n;let h=html||'',T=title||'';
 if(n==='shop'){T='🛒 Shop';h=row('💎','Buy Gems','1 💎 = $1 in BIRD at the live market rate.<br><span id="gp">'+(GP||'Loading price…')+'</span>','<button class="btn" data-a="invest">Open</button>')+row('💱','Trade Token','Buy or sell the token on floor.supwars.fun. Trading involves risk.','<button class="btn" data-a="trade">Open</button>')+row('🟫','New Plot','Plots open: '+st.open+'/16',st.open>=16?'<b>MAX</b>':'<button class="btn" data-a="buyplot"'+(st.gems<plotCost()?' disabled':'')+'>💎 '+fmt(plotCost())+'</button>')+row('✨','Super Soil','Level '+st.soil+'/5 · crops grow 10% faster per level',st.soil>=5?'<b>MAX</b>':'<button class="btn" data-a="buysoil"'+(st.gems<soilCost()?' disabled':'')+'>💎 '+fmt(soilCost())+'</button>')+row('🐦','Helper Bird','Owned '+st.helpers+'/3 · auto-harvests ready crops',st.helpers>=3?'<b>MAX</b>':'<button class="btn" data-a="buyhelp"'+(st.gems<helpCost()?' disabled':'')+'>💎 '+fmt(helpCost())+'</button>')}
-if(n==='barn'){T='🏚️ Barn';const tot=R4(st.crops.reduce((a,c,i)=>a+c*SEEDS[i].s,0)*(1-TAX_SELL));h='<button class="btn" data-a="sellall"'+(tot?'':' disabled')+'>Sell everything · 💎 '+fmt(tot)+'</button>'+(TAX_SELL>0?'<p>'+Math.round(TAX_SELL*100)+'% sale tax is already deducted.</p>':'')+'<p>🔒 Accrued profit: '+(+st.fp||0).toFixed(6)+' 💎 ('+(FREE_BPS/100)+'%/day) · '+(+RATES.free_withdrawals_open_at>0?'withdrawals open '+new Date(RATES.free_withdrawals_open_at*1000).toLocaleDateString():'locked until withdrawals open')+'.</p>';SEEDS.forEach((s,i)=>{h+=row(s.e,s.n+' × '+st.crops[i],'Sells for 💎 '+fmt(R4(s.s*(1-TAX_SELL)))+(TAX_SELL>0?' each (after tax)':' each'),'<button class="btn" data-a="sell" data-i="'+i+'"'+(st.crops[i]?'':' disabled')+'>Sell</button>')})}
+if(n==='barn'){T='🏚️ Barn';const tot=R4(st.crops.reduce((a,c,i)=>a+c*SEEDS[i].s,0)*(1-TAX_SELL));h='<button class="btn" data-a="sellall"'+(tot?'':' disabled')+'>Sell everything · 💎 '+fmt(tot)+'</button>'+(TAX_SELL>0?'<p>'+Math.round(TAX_SELL*100)+'% sale tax is already deducted.</p>':'')+'<p>🔒 Accrued profit: '+(+st.fp||0).toFixed(6)+' 💎 (0.1%/day) · locked until free withdrawals open.</p>';SEEDS.forEach((s,i)=>{h+=row(s.e,s.n+' × '+st.crops[i],'Sells for 💎 '+fmt(R4(s.s*(1-TAX_SELL)))+(TAX_SELL>0?' each (after tax)':' each'),'<button class="btn" data-a="sell" data-i="'+i+'"'+(st.crops[i]?'':' disabled')+'>Sell</button>')})}
 if(n==='quests'){T='📜 Quests';h='';Q.forEach((q,i)=>{const so=q.k==='soc'?st.soc[q.id]:0,pr=q.k==='lvl'?lvl():q.k==='soc'?(so&&Date.now()-so>=WAIT?1:0):q.k==='wallet'?(st.wallet?1:0):st.stats[q.k],ok=pr>=q.g,cl=st.claimed[i],go=q.k==='soc'&&!so?'<button class="btn" data-a="qgo" data-i="'+i+'">Go</button>':null;h+='<div class="row"><div class="ic">📌</div><div class="tx"><b>'+q.t+'</b><small>'+fmt(Math.min(pr,q.g))+' / '+q.g+' · Reward 💎 '+fmt(q.m)+'</small><div class="pb"><i style="width:'+Math.min(100,pr/q.g*100)+'%"></i></div>'+(q.k==='wallet'?(st.wallet?'<small>'+shortAd(st.wallet)+' <button class="btn red" data-a="disconnect">Disconnect</button></small>':'<small><button class="btn" data-a="wallet">Connect</button></small>'):'')+'</div>'+(cl?'<b>✓</b>':go?go:'<button class="btn" data-a="claim" data-i="'+i+'"'+(ok?'':' disabled')+'>Claim</button>')+'</div>'})}
 if(n==='invest'){T='🪺 Nest';h='<div id="inv">Loading…</div>'}
 if(n==='lb'){T='🏆 Leaderboard';h='<p>Ranked by total XP.</p><div id="sbb"></div>'}
@@ -699,13 +688,10 @@ else if(a==='snd'){ls('bf_snd',ls('bf_snd')==='0'?'1':'0');sfxPlant();panel('mor
 else if(a==='wallet'){connectWallet();return}
 else if(a==='login'){loginFailed=false;login().then(()=>{toast('Signed in');loadInvest()}).catch(e=>toast(e.message||'Sign-in cancelled'));return}
 else if(a==='sellmax'){const e=$('sellg');if(e){e.value=SELLMAX;updSellEst()}return}
-else if(a==='isell'){if(SELLBUSY)return;const g=parseFloat(($('sellg')||{}).value);if(!(g>0)){toast('Enter how many gems to sell');return}if(g>SELLMAX+1e-9){toast('You only have '+SELLMAX+' 💎 to sell');return}SELLBUSY=true;trade('sell',{gems:g}).then(r=>{SELLBUSY=false;loadInvest(r&&r.paid?'Sold. BIRD sent to your wallet.':'Sell request sent.')}).catch(e=>{SELLBUSY=false;toast(e.message)});return}
+else if(a==='isell'){if(SELLBUSY)return;const g=parseFloat(($('sellg')||{}).value);if(!(g>0)){toast('Enter how many gems to sell');return}if(g>SELLMAX+1e-9){toast('You only have '+SELLMAX+' 💎 to sell');return}SELLBUSY=true;trade('sell',{gems:g}).then(()=>{SELLBUSY=false;loadInvest('Sell request sent. It is paid to your wallet after review.')}).catch(e=>{SELLBUSY=false;toast(e.message)});return}
 else if(a==='ibuynow'){const g=parseFloat(($('buyg')||{}).value);if(!(g>0)){toast('Enter how many gems to buy');return}buyNow(g);return}
 else if(a==='iquote'){const g=parseFloat(($('buyg')||{}).value);if(!(g>0)){toast('Enter how many gems to buy');return}trade('quote',{gems:g}).then(r=>{BQ=r.quote;loadInvest()}).catch(e=>toast(e.message));return}
 else if(a==='ibuy'){const t=(($('txh')||{}).value||'').trim();if(!BQ||!t){toast('Paste the transaction hash');return}const q=BQ;trade('buy',{quote_id:BQ.id,tx:t}).then(()=>{creditLocal(q,t);BQ=null;loadInvest('Purchase confirmed. Gems added.')}).catch(e=>toast(e.message));return}
-else if(a==='iplant'){if(PLBUSY)return;const sid=($('plantseed')||{}).value;if(!sid)return;PLBUSY=true;trade('plant',{seed:sid}).then(()=>{PLBUSY=false;loadInvest('Planted.')}).catch(e=>{PLBUSY=false;toast(e.message)});return}
-else if(a==='iplantall'){if(PLBUSY)return;PLBUSY=true;(async()=>{let left=SELLMAX,n=0;try{for(let k=SEEDS.length-1;k>=0;k--){while(left+1e-9>=SEEDS[k].c&&n<25){await trade('plant',{seed:SEEDID[k]});left=R4(left-SEEDS[k].c);n++}}PLBUSY=false;loadInvest(n?'Planted '+n+'.':'No gems to plant.')}catch(e){PLBUSY=false;toast(e.message);loadInvest()}})();return}
-else if(a==='iharvest'){if(PLBUSY)return;PLBUSY=true;trade('harvest',{id:+i}).then(()=>{PLBUSY=false;loadInvest('Harvested.')}).catch(e=>{PLBUSY=false;toast(e.message)});return}
 else if(a==='iclaim'){trade('claim').then(()=>loadInvest('Claim request sent. It is paid to your wallet after review.')).catch(e=>toast(e.message));return}
 else if(a==='disconnect'){disconnectWallet();return}
 else if(a==='trade'){window.open(TRADE_URL,'_blank','noopener');return}
@@ -718,7 +704,7 @@ trees();actors();treesD();actorsD();head();seeds();buildGrid();paint();setInterv
 async function updGP(){try{if(!SB)return;const r=await fetch(SUPABASE_URL+'/rest/v1/rpc/gem_price_status',{method:'POST',headers:H,body:'{}'});const d=await r.json();GP=d&&d.ok?'1 💎 = '+Math.round(d.bird_per_gem*(1+TAX_BUY)).toLocaleString()+' BIRD':'Gem price is paused right now.';const e=$('gp');if(e)e.textContent=GP}catch(e){}}
 async function loadEcon(){try{if(!SB)return;const[a,b]=await Promise.all([fetch(SUPABASE_URL+'/rest/v1/seeds_config?select=*&order=sort',{headers:H}).then(r=>r.json()),fetch(SUPABASE_URL+'/rest/v1/economy_config?select=key,value',{headers:H}).then(r=>r.json())]);
 if(Array.isArray(a))a.forEach((d,i)=>{const x=SEEDS[i];if(x){x.c=+d.cost_gems;x.t=+d.grow_secs;x.s=+d.sell_gems;x.l=+d.unlock_lvl}});
-if(Array.isArray(b))b.forEach(d=>{RATES[d.key]=+d.value;if(d.key==='crop_daily_profit_bps')FREE_BPS=+d.value;if(d.key==='sell_tax_bps')TAX_SELL=d.value/1e4;if(d.key==='buy_tax_bps')TAX_BUY=d.value/1e4;if(d.key==='settlement_period_days')PAY_DAYS=+d.value;if(d.key==='weekly_budget_bps')BUDGET=d.value/1e4;if(d.key==='wallet_cap_bps')CAP=d.value/1e4});
+if(Array.isArray(b))b.forEach(d=>{if(d.key==='crop_daily_profit_bps')FREE_BPS=+d.value;if(d.key==='sell_tax_bps')TAX_SELL=d.value/1e4;if(d.key==='buy_tax_bps')TAX_BUY=d.value/1e4;if(d.key==='settlement_period_days')PAY_DAYS=+d.value;if(d.key==='weekly_budget_bps')BUDGET=d.value/1e4;if(d.key==='wallet_cap_bps')CAP=d.value/1e4});
 seeds();head();paint()}catch(e){}}
 loadEcon();restoreWallet();stateLoad();
 if(!st.seen){st.seen=1;save();panel('help')}
