@@ -405,7 +405,7 @@ html.lp-fsl,html.lp-fsl body{overflow:hidden}
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Nunito:ital,wght@0,600;0,800;0,900;1,900&display=swap">
 </head><body>
 <div class="lp-top"><header class="lp-nav"><div class="lp-w lp-nb"><a class="lp-brand" href="#top"><img class="lpl" alt="BIRD" width="46" height="46"><span><b>$BIRD</b><small>on SUPRA</small></span></a>
-<nav><a class="on" href="#top">Home</a><a href="#play">Bird Farm</a><a href="#token">Token</a><a href="#top">Utility <i>Soon</i></a><a href="#roadmap">Roadmap</a><a href="#aboutbird">About</a><a href="#community">Community</a><a class="lp-mx" href="https://x.com/suprabird_" target="_blank" rel="noopener">X (Twitter)</a><a class="lp-mx" href="https://t.me/supra_bird" target="_blank" rel="noopener">Telegram</a></nav>
+<nav><a class="on" href="#top">Home</a><a href="#play">Bird Farm</a><a href="#roadmap">Roadmap</a><a href="#aboutbird">About</a><a class="lp-mx" href="https://x.com/suprabird_" target="_blank" rel="noopener">X (Twitter)</a><a class="lp-mx" href="https://t.me/supra_bird" target="_blank" rel="noopener">Telegram</a></nav>
 <div class="lp-so"><a href="https://x.com/suprabird_" target="_blank" rel="noopener" aria-label="X">X</a><a href="https://t.me/supra_bird" target="_blank" rel="noopener" aria-label="Telegram">&#9992;</a><button class="lp-wal" id="lpWal" data-a="wallet">Connect Wallet</button><div class="lp-wm" id="lpWm" hidden><small id="lpWa"></small><button type="button" id="lpWd">Disconnect wallet</button></div><button class="lp-bg" type="button" aria-label="Menu" aria-expanded="false">&#9776;</button></div></div></header>
 <section class="lp-hero" id="top"><div class="lp-cl c1" aria-hidden="true"></div><div class="lp-cl c2" aria-hidden="true"></div><div class="lp-w lp-hg"><div class="lp-mas"><img class="lpl" alt="BIRD mascot" width="300" height="300"></div>
 <div class="lp-ht"><h1>The <em>$BIRD</em><br>Ecosystem</h1><p>A community-driven token on SUPRA, powering gaming, farming and next-gen trading tools.</p>
@@ -702,8 +702,9 @@ function setInv(r){INV=r;INVW=nz(st.wallet);try{ls('bf_inv',JSON.stringify({w:IN
 const needInv=()=>!!(st.wallet&&SESS&&INVAT!==st.wallet&&Date.now()-INVTRY>15000);
 const nz=a=>(a||'').toLowerCase().replace(/^0x/,'').replace(/^0+/,''),eh=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])),nb=n=>Math.round(+n||0).toLocaleString('en-US');
 async function fn(u,b){const r=await fetch(u,{method:'POST',headers:H,body:JSON.stringify(b)});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'Request failed');return j}
-async function login(){const p=await waitProvider();if(!p)throw new Error('StarKey wallet not detected in this browser. Open the game from the StarKey app browser or a browser with the StarKey extension.');if(!st.wallet)throw new Error('Connect your wallet first');await ensureConnected(p);
-const n=await fn(AU,{action:'nonce',address:st.wallet});const hx='0x'+Array.from(new TextEncoder().encode(n.message),b=>b.toString(16).padStart(2,'0')).join('');const sm=m=>p.signMessage({message:m==='hex'?hx:n.message,nonce:n.nonce});let mode=ls('bf_sm')||(/iPhone|iPad|Android/i.test(navigator.userAgent)?'hex':'plain'),r;try{r=await sm(mode)}catch(e){if(!/BytesLike|bytes|invalid/i.test(String((e&&e.message)||e)))throw e;mode=mode==='hex'?'plain':'hex';r=await sm(mode)}ls('bf_sm',mode);
+const wt=(pr,ms)=>Promise.race([pr,new Promise((_,rj)=>setTimeout(()=>rj(new Error('The wallet did not respond. Open the StarKey extension, unlock it and try again.')),ms))]);
+async function login(){const p=await waitProvider();if(!p)throw new Error('StarKey wallet not detected in this browser. Open the game from the StarKey app browser or a browser with the StarKey extension.');if(!st.wallet)throw new Error('Connect your wallet first');await wt(ensureConnected(p),45000);
+const n=await fn(AU,{action:'nonce',address:st.wallet});const hx='0x'+Array.from(new TextEncoder().encode(n.message),b=>b.toString(16).padStart(2,'0')).join('');const sm=m=>wt(p.signMessage({message:m==='hex'?hx:n.message,nonce:n.nonce}),45000);let mode=ls('bf_sm')||(/iPhone|iPad|Android/i.test(navigator.userAgent)?'hex':'plain'),r;try{r=await sm(mode)}catch(e){if(!/BytesLike|bytes|invalid/i.test(String((e&&e.message)||e)))throw e;mode=mode==='hex'?'plain':'hex';r=await sm(mode)}ls('bf_sm',mode);
 let inner=r&&r.result&&typeof r.result==='object'?r.result:(r||{});
 if(inner.publicKey==null){try{let a=await p.account();a=Array.isArray(a)?a[0]:a;if(a&&a.publicKey)inner={...inner,publicKey:a.publicKey}}catch(e){}}
 const v=await fn(AU,{action:'verify',nonce:n.nonce,response:inner});SESS={token:v.token,address:v.address};ls('bf_sess',JSON.stringify(SESS))}
@@ -781,8 +782,8 @@ if(!st.wallet){el.innerHTML='<p>Trade 💎 gems for BIRD in the Nest. Connect yo
 if(BBat!==st.wallet||BB===null)await refreshBird();
 const ok=SESS&&nz(SESS.address)===nz(st.wallet);
 if(!ok){
-if(loginBusy){el.innerHTML='<p>Confirm the sign-in in your wallet…</p>';setTimeout(()=>{if(cur==='invest')loadInvest(msg)},1500);return}
-if(!loginFailed){el.innerHTML='<p>Confirm the sign-in in your wallet…</p>';await autoLogin();if(cur==='invest')return loadInvest(msg);return}
+if(loginBusy){el.innerHTML='<p>Confirm the sign-in in your wallet… If nothing pops up, open the StarKey extension (it may be waiting there).</p>';setTimeout(()=>{if(cur==='invest')loadInvest(msg)},1500);return}
+if(!loginFailed){el.innerHTML='<p>Confirm the sign-in in your wallet… If nothing pops up, open the StarKey extension (it may be waiting there).</p>';await autoLogin();if(cur==='invest')return loadInvest(msg);return}
 el.innerHTML=birdLine()+(msg?'<p>'+eh(msg)+'</p>':'')+'<p>Sign-in did not finish'+(loginErr?': '+eh(loginErr):'')+'. It is free and sends no transaction.</p><button class="btn" data-a="login">Sign in</button>';return}
 try{const s=await trade('status');setInv(s);INVAT=st.wallet;try{head();paint()}catch(e){}if(s.bird_balance!=null){BB=+s.bird_balance;BBat=st.wallet}el.innerHTML=birdLine()+invHtml(s,msg)}catch(e){loginFailed=true;el.innerHTML='<p>'+eh(e.message)+'</p><button class="btn" data-a="login">Sign in again</button>'}}
 const shortAd=a=>a?a.slice(0,6)+'…'+a.slice(-4):'';
