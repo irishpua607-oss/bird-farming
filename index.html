@@ -488,7 +488,7 @@ const AU=SUPABASE_URL+'/functions/v1/auth',TR=SUPABASE_URL+'/functions/v1/trade'
 let SESS=null;try{SESS=JSON.parse(ls('bf_sess')||'null')}catch(e){}
 let INV=null,INVW='',INVAT='',INVTRY=0,FBUSY=false;
 try{const c=JSON.parse(ls('bf_inv')||'null'),n2=a=>(a||'').toLowerCase().replace(/^0x/,'').replace(/^0+/,'');if(c&&c.d&&st.wallet&&c.w===n2(st.wallet)){INV=c.d;INVW=c.w}}catch(e){}
-function setInv(r){setInv(r);try{ls('bf_inv',JSON.stringify({w:INVW,d:{investor:r.investor,paid_gems:r.paid_gems,plantings:r.plantings,crop_rate_bps:r.crop_rate_bps,crop_daily_profit_bps:r.crop_daily_profit_bps,crop_bonus_ends_at:r.crop_bonus_ends_at}}))}catch(e){}}
+function setInv(r){INV=r;INVW=nz(st.wallet);try{ls('bf_inv',JSON.stringify({w:INVW,d:{investor:r.investor,paid_gems:r.paid_gems,plantings:r.plantings,crop_rate_bps:r.crop_rate_bps,crop_daily_profit_bps:r.crop_daily_profit_bps,crop_bonus_ends_at:r.crop_bonus_ends_at}}))}catch(e){}}
 const needInv=()=>!!(st.wallet&&SESS&&INVAT!==st.wallet&&Date.now()-INVTRY>15000);
 const nz=a=>(a||'').toLowerCase().replace(/^0x/,'').replace(/^0+/,''),eh=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])),nb=n=>Math.round(+n||0).toLocaleString('en-US');
 async function fn(u,b){const r=await fetch(u,{method:'POST',headers:H,body:JSON.stringify(b)});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'Request failed');return j}
