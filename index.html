@@ -688,14 +688,23 @@ const SB=SUPABASE_URL&&SUPABASE_ANON_KEY,H={apikey:SUPABASE_ANON_KEY,Authorizati
 const ls=(k,v)=>{try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){}};
 let pid=ls('bf_pid');if(!pid){pid=(crypto.randomUUID?crypto.randomUUID():'p'+Date.now()+Math.random().toString(16).slice(2));ls('bf_pid',pid)}
 let pkey=ls('bf_key');if(!pkey||pkey.length<20){pkey=(crypto.randomUUID?crypto.randomUUID()+crypto.randomUUID():'k'+Date.now()+Math.random().toString(16).slice(2)+Math.random().toString(16).slice(2));ls('bf_key',pkey)}
-let rev=+(ls('bf_rev')||0),stateReady=false,pushing=false,lastPush=0;
-const stateFn=(action,body)=>fetch(SUPABASE_URL+'/functions/v1/state',{method:'POST',headers:H,body:JSON.stringify({action,id:pid,key:pkey,...body})}).then(r=>r.json().catch(()=>({})).then(j=>({ok:r.ok,status:r.status,j})));
-const adopt=(o,r)=>{if(o&&o.plots&&o.plots.length===16){st=Object.assign(fresh(),o);rev=r;ls('bf_rev',rev);ls(KEY,JSON.stringify(st));try{seeds();head();paint()}catch(e){}}};
-async function statePush(force){if(!SB||pushing||(!stateReady&&!force))return;const n=Date.now();if(!force&&n-lastPush<10000)return;pushing=true;lastPush=n;
-try{const r=await stateFn('save',{state:st,rev});if(r.ok){rev=r.j.rev;ls('bf_rev',rev);if(r.j.state&&(+r.j.state.xp!==st.xp||+r.j.state.fp!==+st.fp)){st.xp=r.j.state.xp;st.fp=r.j.state.fp}}
+let rev=+(ls('bf_rev')||0),stateReady=false,pushing=false,lastPush=0,linked='',linking=false,wpid='';
+const tok=()=>{try{return(SESS&&SESS.token&&st.wallet&&nz(SESS.address)===nz(st.wallet))?SESS.token:''}catch(e){return''}};
+const revKey=()=>tok()?'bf_wrev':'bf_rev';
+const dropSess=()=>{SESS=null;try{localStorage.removeItem('bf_sess')}catch(e){}linked='';wpid='';rev=+(ls('bf_rev')||0)};
+const stateFn=(action,body)=>{const t=tok();return fetch(SUPABASE_URL+'/functions/v1/state',{method:'POST',headers:H,body:JSON.stringify({action,id:pid,key:pkey,...(t?{token:t}:{}),...body})}).then(r=>r.json().catch(()=>({})).then(j=>{if(t&&r.status===401)dropSess();return{ok:r.ok,status:r.status,j}}))};
+const adopt=(o,r)=>{if(o&&o.plots&&o.plots.length===16){st=Object.assign(fresh(),o);rev=r;ls(revKey(),rev);ls(KEY,JSON.stringify(st));try{seeds();head();paint()}catch(e){}}};
+async function statePush(force){if(!SB||pushing||(!stateReady&&!force)||(tok()&&linked!==nz(st.wallet)))return;const n=Date.now();if(!force&&n-lastPush<10000)return;pushing=true;lastPush=n;
+try{const r=await stateFn('save',{state:st,rev});if(r.ok){rev=r.j.rev;ls(revKey(),rev);if(r.j.state&&(+r.j.state.xp!==st.xp||+r.j.state.fp!==+st.fp)){st.xp=r.j.state.xp;st.fp=r.j.state.fp}}
 else if(r.status===409){if(r.j.state)adopt(r.j.state,r.j.rev);else{const l=await stateFn('load');if(l.ok&&l.j.state)adopt(l.j.state,l.j.rev)}}}catch(e){}pushing=false}
-async function stateLoad(){if(!SB)return;try{const r=await stateFn('load');if(r.ok){if(r.j.state){adopt(r.j.state,r.j.rev);stateReady=true}else{stateReady=true;await statePush(true)}}}catch(e){}}
-const scoreFn=body=>fetch(SUPABASE_URL+'/functions/v1/score',{method:'POST',headers:H,body:JSON.stringify({id:pid,key:pkey,...body})});
+async function stateLoad(){if(!SB)return;try{if(tok()){await linkWallet();if(linked===nz(st.wallet))return}const r=await stateFn('load');if(r.ok){if(r.j.state){adopt(r.j.state,r.j.rev);stateReady=true}else{stateReady=true;await statePush(true)}}}catch(e){}}
+async function linkWallet(){const t=tok();if(!SB||!t||linking||linked===nz(st.wallet))return;linking=true;
+try{const r=await stateFn('link',{state:st});
+if(r.ok&&r.j){linked=nz(st.wallet);wpid=r.j.profile||'';stateReady=true;
+if(r.j.state)adopt(r.j.state,r.j.rev);else{rev=r.j.rev||0;ls(revKey(),rev)}
+if(r.j.name&&!pname){pname=r.j.name;ls('bf_name',pname)}
+lastXp=-1;sync(true)}}catch(e){}linking=false}
+const scoreFn=body=>{const t=tok();return fetch(SUPABASE_URL+'/functions/v1/score',{method:'POST',headers:H,body:JSON.stringify({id:pid,key:pkey,...(t?{token:t}:{}),...body})}).then(r=>{if(t&&r.status===401)dropSess();return r})};
 let pname=ls('bf_name')||'',lastSync=0,lastXp=-1;
 const save=()=>{ls(KEY,JSON.stringify(st));sync();statePush()};
 const addrOf=x=>Array.isArray(x)?addrOf(x[0]):(x&&typeof x==='object'?(x.address||x.account||(x.accounts&&addrOf(x.accounts))):x);
@@ -703,7 +712,7 @@ async function waitProvider(ms){ms=ms==null?4000:ms;const t=Date.now();for(;;){c
 async function ensureConnected(p){let a=null;try{a=await p.account()}catch(e){}if(addrOf(a))return a;return await p.connect()}
 async function restoreWallet(){try{const p=await waitProvider(4000);if(!p)return;let a=null;try{a=addrOf(await p.account())}catch(e){}
 if(typeof a==='string'&&a.startsWith('0x')&&!st.wallet){st.wallet=a;save();sync(true)}
-if(p.on)p.on('accountChanged',acc=>{const n=addrOf(acc);if(typeof n==='string'&&n.startsWith('0x')&&nz(n)!==nz(st.wallet)){st.wallet=n;SESS=null;try{localStorage.removeItem('bf_sess')}catch(_){}loginFailed=false;save();if(cur==='invest'&&!$('sheet').hidden)loadInvest()}})}catch(e){}}
+if(p.on)p.on('accountChanged',acc=>{const n=addrOf(acc);if(typeof n==='string'&&n.startsWith('0x')&&nz(n)!==nz(st.wallet)){st.wallet=n;dropSess();loginFailed=false;save();if(cur==='invest'&&!$('sheet').hidden)loadInvest()}})}catch(e){}}
 async function connectWallet(){try{const p=await waitProvider();if(!p){toast('No Supra wallet (StarKey) found. Install it and refresh.');return}
 const r=await ensureConnected(p);let acc=r;try{const a2=await p.account();if(a2)acc=a2}catch(e){}
 const pick=x=>Array.isArray(x)?pick(x[0]):(x&&typeof x==='object'?(x.address||x.account||(x.accounts&&pick(x.accounts))):x);
@@ -720,7 +729,7 @@ async function login(){const p=await waitProvider();if(!p)throw new Error('StarK
 const n=await fn(AU,{action:'nonce',address:st.wallet});const hx='0x'+Array.from(new TextEncoder().encode(n.message),b=>b.toString(16).padStart(2,'0')).join('');const sm=m=>Promise.race([p.signMessage({message:m==='hex'?hx:n.message,nonce:n.nonce}),new Promise((_,j)=>setTimeout(()=>j(new Error('Your wallet did not respond. Open StarKey, approve the sign-in request, then press Sign in.')),60000))]);let mode=ls('bf_sm')||(/iPhone|iPad|Android/i.test(navigator.userAgent)?'hex':'plain'),r;try{r=await sm(mode)}catch(e){if(!/BytesLike|bytes|invalid/i.test(String((e&&e.message)||e)))throw e;mode=mode==='hex'?'plain':'hex';r=await sm(mode)}ls('bf_sm',mode);
 let inner=r&&r.result&&typeof r.result==='object'?r.result:(r||{});
 if(inner.publicKey==null){try{let a=await p.account();a=Array.isArray(a)?a[0]:a;if(a&&a.publicKey)inner={...inner,publicKey:a.publicKey}}catch(e){}}
-const v=await fn(AU,{action:'verify',nonce:n.nonce,response:inner});SESS={token:v.token,address:v.address};ls('bf_sess',JSON.stringify(SESS))}
+const v=await fn(AU,{action:'verify',nonce:n.nonce,response:inner});SESS={token:v.token,address:v.address};ls('bf_sess',JSON.stringify(SESS));linked='';linkWallet().catch(()=>{})}
 async function trade(action,x,_r){if(!SESS||nz(SESS.address)!==nz(st.wallet))await login();try{return await fn(TR,{action,token:SESS.token,...x})}catch(e){if(/not logged in/i.test(e.message)){SESS=null;try{localStorage.removeItem('bf_sess')}catch(_){}if(!_r)return trade(action,x,1)}throw e}}
 const BIRD_META='0x38eb2b5380cfa493031ed527077598e3024465bd27f09dd0dd86ddcab34f5e81';
 let BB=null,BBat='';
@@ -785,7 +794,8 @@ if(+s.claimable_bird>0)h+=row('🪙','Profit','','<b>'+nb(s.claimable_bird)+' BI
 SELLP=+s.sell_bird_per_gem||0;SELLFEE=(+s.sell_fee_bps||0)/10000;SELLMAX=+s.paid_gems||0;
 h+=row('💱','Sell gems',(SELLP?nb(SELLP)+' BIRD per 💎':'Live price')+'<br><span id="sellest"></span>'+(s.can_sell?'':' <b>Soon</b>'),'<input id="sellg" type="number" min="0" step="any" placeholder="Gems"><br><button class="btn" data-a="sellmax"'+(s.can_sell&&s.paid_gems>0?'':' disabled')+'>Max</button> <button class="btn" data-a="isell"'+(s.can_sell&&s.paid_gems>0?'':' disabled')+'>Sell</button>');
 h+=buyRow(s);
-const rec=[...(s.withdrawals||[]).map(w=>'Sell '+fmt(w.gems)+' 💎 · '+nb(w.net_bird)+' BIRD · '+w.status),...(s.claims||[]).map(c=>'Claim '+nb(c.net_bird)+' BIRD · '+c.status)];
+const isOpen=x=>x.status==='pending'||x.status==='approved';
+const rec=[...(s.withdrawals||[]).filter(isOpen).map(w=>'Sell '+fmt(w.gems)+' 💎 · '+nb(w.net_bird)+' BIRD · '+w.status),...(s.claims||[]).filter(isOpen).map(c=>'Claim '+nb(c.net_bird)+' BIRD · '+c.status)];
 return h+(rec.length?'<p><small>Recent: '+rec.map(eh).join(' | ')+'</small></p>':'')}
 let loginBusy=false,loginFailed=false,loginErr='';
 async function autoLogin(){if(loginBusy)return;loginBusy=true;try{await login();loginFailed=false;loginErr=''}catch(e){loginFailed=true;loginErr=(e&&e.message)||''}loginBusy=false}
@@ -801,7 +811,7 @@ el.innerHTML=birdLine()+(msg?'<p>'+eh(msg)+'</p>':'')+'<p>Sign-in did not finish
 try{const s=await trade('status');setInv(s);INVAT=st.wallet;try{head();paint()}catch(e){}if(s.bird_balance!=null){BB=+s.bird_balance;BBat=st.wallet}el.innerHTML=birdLine()+invHtml(s,msg)}catch(e){loginFailed=true;el.innerHTML='<p>'+eh(e.message)+'</p><button class="btn" data-a="login">Sign in again</button>'}}
 const shortAd=a=>a?a.slice(0,6)+'…'+a.slice(-4):'';
 async function disconnectWallet(){INV=null;INVAT='';try{localStorage.removeItem('bf_inv')}catch(e){}try{const p=window.starkey&&window.starkey.supra;if(p&&typeof p.disconnect==='function'){try{await p.disconnect()}catch(e){}}}catch(e){}
-st.wallet='';SESS=null;loginFailed=false;try{localStorage.removeItem('bf_sess')}catch(e){}lastXp=-1;save();
+st.wallet='';dropSess();loginFailed=false;lastXp=-1;save();
 if(SB){try{scoreFn({name:pname||'Farmer',clear_wallet:true}).catch(()=>{})}catch(e){}}
 sync(true);toast('Wallet disconnected.');if(!$('sheet').hidden)panel(cur==='more'?'more':'quests')}
 function sync(force){if(!SB||!pname||st.xp===lastXp)return;const n=Date.now();if(!force&&n-lastSync<15000)return;lastSync=n;lastXp=st.xp;
@@ -814,7 +824,7 @@ if(!pname){el.innerHTML='<p>Enter a name to join the leaderboard:</p><p><input i
 el.innerHTML='<p>Loading…</p>';
 try{const r=await fetch(SUPABASE_URL+'/rest/v1/scores?select=id,name,xp,lvl,harv&order=xp.desc&limit=20',{headers:H});if(!r.ok)throw 0;const d=await r.json();if(cur!=='lb')return;
 if(!d.length){el.innerHTML='<p>No one is on the leaderboard yet. Go harvest some crops!</p>';return}
-const medal=['🥇','🥈','🥉'];el.innerHTML=d.map((v,i)=>row(medal[i]||('#'+(i+1)),esc(v.name)+(v.id===pid?' (you)':''),'Lv '+v.lvl+' · '+v.harv+' harvests','<b>'+v.xp+' XP</b>')).join('')}catch(e){if(cur==='lb')el.innerHTML='<p>Could not load the leaderboard. Please try again later.</p>'}}
+const medal=['🥇','🥈','🥉'];el.innerHTML=d.map((v,i)=>row(medal[i]||('#'+(i+1)),esc(v.name)+((v.id===pid||(wpid&&v.id===wpid))?' (you)':''),'Lv '+v.lvl+' · '+v.harv+' harvests','<b>'+v.xp+' XP</b>')).join('')}catch(e){if(cur==='lb')el.innerHTML='<p>Could not load the leaderboard. Please try again later.</p>'}}
 let tt;function toast(t){const e=$('toast');e.textContent=t;e.className='toast on';clearTimeout(tt);tt=setTimeout(()=>e.className='toast',2200)}
 function head(){badges();const L=lvl(),lo=20*(L-1)**2,hi=20*L*L;$('coins').style.display='none';$('gems').textContent='💎 '+fmt(IM()?(+INV.paid_gems||0):st.gems);$('lvl').textContent='Farmer Bird · Lv '+L;$('lvn').textContent=L;$('xpt').textContent=st.xp+' / '+hi;$('xpb').style.width=((st.xp-lo)/(hi-lo)*100)+'%'}
 function seeds(){const L=lvl();$('seeds').innerHTML='';SEEDS.forEach((s,i)=>{const b=document.createElement('button');b.className='seed'+(st.sel===i?' on':'')+(L<s.l?' lock':'');b.innerHTML='<span>'+(L<s.l?'🔒':s.e)+'</span>'+s.n+'<br>💎'+fmt(s.c)+(L<s.l?' · Lv'+s.l:'');b.onclick=()=>{if(L<s.l){toast('Reach level '+s.l+' to unlock '+s.n);return}st.sel=i;save();seeds()};$('seeds').appendChild(b)})}
