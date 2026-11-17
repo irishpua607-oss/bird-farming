@@ -452,7 +452,7 @@ html.lp-fsl,html.lp-fsl body{overflow:hidden}
 <div class="lp-tw"><table><thead><tr><th>Crop</th><th>Seed cost</th><th>Grow time</th><th>Unlocks</th></tr></thead><tbody>
 <tr><td>&#127806; Wheat</td><td>&#128142; 0.1</td><td>30 min</td><td>Lv 1</td></tr><tr><td>&#129365; Carrot</td><td>&#128142; 0.25</td><td>1 h</td><td>Lv 1</td></tr><tr><td>&#127805; Corn</td><td>&#128142; 0.5</td><td>2 h</td><td>Lv 2</td></tr><tr><td>&#127875; Pumpkin</td><td>&#128142; 1</td><td>4 h</td><td>Lv 3</td></tr><tr><td>&#127827; Strawberry</td><td>&#128142; 2</td><td>8 h</td><td>Lv 4</td></tr></tbody></table></div>
 <p class="lp-sm" style="margin-top:12px">These times are for the free farm. In the Nest (paid gems), every crop takes 24 hours, whatever the crop, and Super Soil does not change that.</p>
-<div class="lp-cards"><div class="lp-c"><h3>&#129001; New Plot</h3><p>Open up to 16 plots. The price rises with each plot.</p></div><div class="lp-c"><h3>&#10024; Super Soil</h3><p>5 levels. Each one makes free-farm crops grow 10% faster. It does not shorten the 24-hour Nest crops.</p></div><div class="lp-c"><h3>&#128038; Helper Bird</h3><p>Up to 3 helpers. They auto-harvest ready crops.</p></div><div class="lp-c"><h3>&#9193; Finish now</h3><p>Skip the wait on one plot for &#128142; 0.2.</p></div></div></div></section>
+<div class="lp-cards"><div class="lp-c"><h3>&#129001; New Plot</h3><p>Open up to 16 plots. The price rises with each plot.</p></div><div class="lp-c"><h3>&#10024; Super Soil</h3><p>5 levels. Each one makes free-farm crops grow 10% faster. It does not shorten the 24-hour Nest crops.</p></div><div class="lp-c"><h3>&#128038; Helper Bird</h3><p>Up to 3 helpers. They auto-harvest ready crops.</p></div><div class="lp-c"><h3>&#9193; Finish now</h3><p>Skip the wait on one plot for &#128142; 0.2 per hour left (min 0.55).</p></div></div></div></section>
 <section class="lp-cream" id="nest"><div class="lp-w"><h2>For investors: the Nest</h2>
 <div class="lp-cards lp-l"><div class="lp-c"><h3>Buy gems with BIRD</h3><p>1 &#128142; = $1 in BIRD at the live market rate. A buy fee applies and is shown before you confirm.</p></div><div class="lp-c"><h3>Farm for BIRD</h3><p>Paid gems are used for planting. Every crop takes 24 hours and pays profit in BIRD. The current %/day is shown in the Nest and can include a bonus period.</p></div><div class="lp-c"><h3>Claim or sell back</h3><p>Claim your BIRD profit in the Nest, or sell gems back for BIRD at the live price. The fee is shown before you confirm.</p></div></div>
 <div class="lp-tok"><b>BIRD token</b><code>0x38eb2b5380cfa493031ed527077598e3024465bd27f09dd0dd86ddcab34f5e81</code><a href="https://dex.supwars.fun/swap?from=0x000000000000000000000000000000000000000000000000000000000000000a&amp;to=0x38eb2b5380cfa493031ed527077598e3024465bd27f09dd0dd86ddcab34f5e81" target="_blank" rel="noopener">Trade BIRD</a><a href="https://dex.supwars.fun/swap?from=0x000000000000000000000000000000000000000000000000000000000000000a&amp;to=0x38eb2b5380cfa493031ed527077598e3024465bd27f09dd0dd86ddcab34f5e81" target="_blank" rel="noopener">WARs DEX</a></div>
@@ -636,7 +636,7 @@ const GAME_INFO=`<div class="gg">
 <p><b>Free farm times.</b> In the Nest, every crop takes 24 hours.<br>🌾 Wheat: 💎 0.1, 30 min, Lv 1<br>🥕 Carrot: 💎 0.25, 1 h, Lv 1<br>🌽 Corn: 💎 0.5, 2 h, Lv 2<br>🎃 Pumpkin: 💎 1, 4 h, Lv 3<br>🍓 Strawberry: 💎 2, 8 h, Lv 4</p>
 <p>You start with 💎 1 and 6 of 16 plots open. Free-farm gems stay inside the game.</p>
 <h3>Shop upgrades</h3>
-<p>🟫 New Plot: opens up to 16 plots, the price rises with each plot.<br>✨ Super Soil: 5 levels, each makes free-farm crops grow 10% faster. It does not shorten Nest crops, which always take 24 hours.<br>🐦 Helper Bird: up to 3, they auto-harvest ready crops.<br>⏩ Finish now: skip the wait on one plot for 💎 0.2.</p>
+<p>🟫 New Plot: opens up to 16 plots, the price rises with each plot.<br>✨ Super Soil: 5 levels, each makes free-farm crops grow 10% faster. It does not shorten Nest crops, which always take 24 hours.<br>🐦 Helper Bird: up to 3, they auto-harvest ready crops.<br>⏩ Finish now: skip the wait on one plot for 💎 0.2 per hour left (min 0.55).</p>
 <h3>Quests and leaderboard</h3>
 <p>Quests give small gem rewards: harvest, plant, sell, follow @suprabird_ on X, retweet the pinned post, join the Telegram group and connect your wallet. Your XP goes to the Top 🏆 leaderboard under the name you choose.</p>
 <h3>For investors: the Nest 🪺</h3>
@@ -659,7 +659,7 @@ const Q=[{t:'Harvest 10 crops',k:'harv',g:10,c:50,m:1},{t:'Plant 15 seeds',k:'pl
 {t:'Join the Telegram group',k:'soc',id:'tg',url:'https://t.me/supra_bird',g:1,c:100,m:2},
 {t:'Connect your Supra wallet',k:'wallet',g:1,c:200,m:3}];
 const WAIT=8000,TRADE_URL='https://dex.supwars.fun/swap?from=0x000000000000000000000000000000000000000000000000000000000000000a&to=0x38eb2b5380cfa493031ed527077598e3024465bd27f09dd0dd86ddcab34f5e81';
-let FREE_BPS=10;const R8=n=>Math.round(n*1e8)/1e8;const R4=n=>Math.round(n*1e4)/1e4,fmt=n=>String(R4(n)),SPEED=0.2;
+let FREE_BPS=10;const R8=n=>Math.round(n*1e8)/1e8;const R4=n=>Math.round(n*1e4)/1e4,fmt=n=>String(R4(n)),SPEED=0.2;const SPEEDMIN=0.55;const speedCost=i=>{const p=st.plots[i];if(!p)return SPEEDMIN;const left=Math.max(0,dur(SEEDS[p.s])-(Date.now()-p.at))/3600000;return Math.max(SPEEDMIN,R4(SPEED*left))};
 const fmtT=t=>t>=3600?Math.floor(t/3600)+'h '+Math.floor(t%3600/60)+'m':t>=60?Math.floor(t/60)+'m '+(t%60)+'s':t+'s';
 Q.forEach(q=>{q.c=0;q.m=R4(q.m/10)});
 let TAX_SELL=0,TAX_BUY=0.05,GP='',PAY_DAYS=7,BUDGET=0.4,CAP=0.1;
@@ -915,7 +915,7 @@ if(IM()){itap(i);return}
 const p=st.plots[i];
 if(!p){const s=SEEDS[st.sel];if(lvl()<s.l){toast(s.n+' is locked');return}if(st.gems<s.c){toast('Not enough 💎. Sell crops from your Barn.');return}st.gems=R4(st.gems-s.c);st.plots[i]={s:st.sel,at:Date.now()};st.stats.plant++;sfxPlant();toast('Planted '+s.n+'!')}
 else if(ready(p))harvest(i);
-else{const left=Math.ceil((dur(SEEDS[p.s])-(Date.now()-p.at))/1000);panel('msg','Still growing','<p>'+SEEDS[p.s].e+' Ready in '+fmtT(left)+'.</p><button class="btn" data-a="speed" data-i="'+i+'"'+(st.gems<SPEED?' disabled':'')+'>Finish now · 💎 '+SPEED+'</button>');return}
+else{const left=Math.ceil((dur(SEEDS[p.s])-(Date.now()-p.at))/1000);panel('msg','Still growing','<p>'+SEEDS[p.s].e+' Ready in '+fmtT(left)+'.</p><button class="btn" data-a="speed" data-i="'+i+'"'+(st.gems<speedCost(i)?' disabled':'')+'>Finish now · 💎 '+fmt(speedCost(i))+'</button>');return}
 save();head();paint()}
 const row=(ic,t,sub,btn)=>'<div class="row"><div class="ic">'+ic+'</div><div class="tx"><b>'+t+'</b><small>'+sub+'</small></div>'+btn+'</div>';
 function panel(n,title,html){cur=n;let h=html||'',T=title||'';
@@ -949,7 +949,7 @@ else if(a==='buyhelp'&&st.helpers<3&&st.gems>=helpCost()){st.gems=R4(st.gems-hel
 else if(a==='sell'&&st.crops[i]){st.crops[i]--;{const g=R4(SEEDS[i].s*(1-TAX_SELL));st.gems=R4(st.gems+g);st.stats.earn=R4(st.stats.earn+g)}}
 else if(a==='sellall'){let g=0;st.crops.forEach((c,k)=>{g+=c*SEEDS[k].s});g=R4(g*(1-TAX_SELL));st.gems=R4(st.gems+g);st.stats.earn=R4(st.stats.earn+g);st.crops=[0,0,0,0,0]}
 else if(a==='claim'&&!st.claimed[i]){st.claimed[i]=1;st.gems=R4(st.gems+Q[i].m);toast('Quest reward claimed!')}
-else if(a==='speed'&&st.gems>=SPEED&&st.plots[i]){st.gems=R4(st.gems-SPEED);st.plots[i].at=0;$('sheet').hidden=true}
+else if(a==='speed'&&st.plots[i]&&st.gems>=speedCost(i)){st.gems=R4(st.gems-speedCost(i));st.plots[i].at=0;$('sheet').hidden=true}
 else if(a==='qgo'&&Q[i]&&Q[i].url){window.open(Q[i].url,'_blank','noopener');st.soc[Q[i].id]=Date.now();setTimeout(()=>{if(cur==='quests'&&!$('sheet').hidden)panel('quests')},WAIT+200)}
 else if(a==='harvestall'&&IM()){iharvestAll();return}
 else if(a==='harvestall'){let n=0;for(let k=0;k<st.open;k++){const q=st.plots[k];if(q&&ready(q)){harvest(k);n++}}if(!n){toast('Nothing ready to harvest yet');return}}
